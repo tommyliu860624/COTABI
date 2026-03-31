@@ -158,7 +158,7 @@
         </header>
 
         <!-- Main Content Area -->
-        <main ref="mainScrollArea" class="flex-1 overflow-y-auto hide-scrollbar pb-28 relative scroll-smooth">
+        <main ref="mainScrollArea" class="flex-1 overflow-y-auto hide-scrollbar pb-32 relative scroll-smooth">
             <transition name="fade" mode="out-in">
                 
                 <!-- Tab: 總覽 Dashboard -->
@@ -843,8 +843,8 @@
         </transition>
 
         <!-- Bottom Navigation -->
-        <nav class="glass-panel fixed bottom-0 w-full max-w-md pb-safe z-50">
-            <div class="flex justify-around items-center h-[65px] px-2 relative outline-none">
+        <nav class="glass-panel fixed bottom-0 w-full max-w-md z-50" style="padding-bottom: max(16px, env(safe-area-inset-bottom));">
+            <div class="flex justify-around items-center h-[65px] px-2 relative outline-none pt-1">
                 <button v-for="tab in tabs" :key="tab.id" @click="switchTab(tab.id)" 
                     class="flex-1 flex flex-col items-center justify-center h-full space-y-1 transition-colors group relative outline-none">
                     <template v-if="tab.id === 'home'">
@@ -933,11 +933,11 @@
             uncheck: () => { playTone(600, 'sine', 0.05, 0.03); setTimeout(() => playTone(400, 'sine', 0.1, 0.03), 50); }, // 取消打勾 (下沉)
             success: () => { playTone(440, 'sine', 0.1, 0.03); setTimeout(() => playTone(554, 'sine', 0.1, 0.03), 100); setTimeout(() => playTone(659, 'sine', 0.2, 0.03), 200); }, // 解鎖成功
             error: () => { playTone(300, 'sawtooth', 0.1, 0.02); setTimeout(() => playTone(250, 'sawtooth', 0.2, 0.02), 120); }, // 解鎖失敗
-            splash: () => { // 開場和弦 (C-E-G-B)
-                playTone(523.25, 'sine', 2.0, 0.05); // C5
-                setTimeout(() => playTone(659.25, 'sine', 2.0, 0.05), 150); // E5
-                setTimeout(() => playTone(783.99, 'sine', 2.0, 0.05), 300); // G5
-                setTimeout(() => playTone(987.77, 'sine', 2.5, 0.05), 450); // B5
+            splash: () => { // 開場和弦 (降低音量以平衡系統操作聲)
+                playTone(523.25, 'sine', 2.0, 0.015); // C5
+                setTimeout(() => playTone(659.25, 'sine', 2.0, 0.015), 150); // E5
+                setTimeout(() => playTone(783.99, 'sine', 2.0, 0.015), 300); // G5
+                setTimeout(() => playTone(987.77, 'sine', 2.5, 0.015), 450); // B5
             },
             transition: () => { // 紅點放大轉場 (明亮、喜悅的向上魔法琶音)
                 if (!audioCtx) return;
@@ -949,7 +949,7 @@
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
                     gain.gain.setValueAtTime(0, audioCtx.currentTime + delay);
-                    gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + delay + 0.05);
+                    gain.gain.linearRampToValueAtTime(0.015, audioCtx.currentTime + delay + 0.05); // 降低音量以平衡
                     gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + 0.8);
                     osc.connect(gain);
                     gain.connect(audioCtx.destination);
