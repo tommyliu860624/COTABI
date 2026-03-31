@@ -170,7 +170,8 @@
                         </div>
                         <div class="flex justify-between items-start mb-4 relative z-10">
                             <h2 class="text-xl font-medium tracking-wide">{{ greetingText }}，<span class="text-stone-300">{{ locationName }}</span></h2>
-                            <button @click="updateLocation" :disabled="isFetchingWeather" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all disabled:opacity-50 border border-stone-600 hover:bg-stone-700 text-stone-300 relative group">
+                            <!-- 修改按鈕點擊事件，傳遞 false 確保手動點擊時會發出音效 -->
+                            <button @click="updateLocation(false)" :disabled="isFetchingWeather" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all disabled:opacity-50 border border-stone-600 hover:bg-stone-700 text-stone-300 relative group">
                                 <i class="ph-bold ph-crosshair-simple text-sm" :class="{'animate-spin text-white': isFetchingWeather}"></i>
                             </button>
                         </div>
@@ -1251,16 +1252,49 @@
                     }
                 };
 
-                const updateLocation = () => {
+                const updateLocation = (isAuto = false) => {
                     if (isFetchingWeather.value) return; 
-                    playSound('pop');
+                    // 自動定位不發出按鈕聲音，只有手動點擊才發聲
+                    if (isAuto !== true) playSound('pop'); 
                     isFetchingWeather.value = true;
+                    
                     if ("geolocation" in navigator) {
                         navigator.geolocation.getCurrentPosition(
-                            (p) => fetchWeatherData(p.coords.latitude, p.coords.longitude),
-                            () => fetchWeatherData(35.6895, 139.6917)
+                            (p) => {
+                                // 成功取得定位：同時更新天氣與真實地名
+                                fetchWeatherData(p.coords.latitude, p.coords.longitude);
+                                fetchLocationName(p.coords.latitude, p.coords.longitude);
+                            },
+                            (err) => {
+                                // 若使用者拒絕定位或失敗，則預設帶入東京
+                                console.warn("定位權限未開啟或失敗，使用預設值");
+                                locationName.value = '東京';
+                                fetchWeatherData(35.6895, 139.6917);
+                            },
+                            { timeout: 10000, maximumAge: 60000 }
                         );
-                    } else { fetchWeatherData(35.6895, 139.6917); }
+                    } else { 
+                        locationName.value = '東京';
+                        fetchWeatherData(35.6895, 139.6917); 
+                    }
+                };
+
+                const fetchLocationName = async (lat, lon) => {
+                    try {
+                        // 使用開源的 OpenStreetMap API 將經緯度轉為地名
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&accept-language=zh-TW`);
+                        const data = await res.json();
+                        if (data && data.address) {
+                            const addr = data.address;
+                            // 優先取用城市、鄉鎮市區，若無則取縣市或國家
+                            let name = addr.city || addr.town || addr.village || addr.county || addr.state || '目前位置';
+                            // 移除常見的贅字以保持介面簡潔 (例如 "台北市" 變成 "台北")
+                            name = name.replace(/(市|區|縣|町)$/, '');
+                            locationName.value = name;
+                        }
+                    } catch (e) {
+                        console.warn("無法取得地名", e);
+                    }
                 };
 
                 const fetchWeatherData = async (lat, lon) => {
@@ -1382,8 +1416,8 @@
                     setTimeout(() => { splashStep.value = 3; sfx.transition(); }, 2400);  
                     setTimeout(() => { showSplash.value = false; }, 3200); 
 
-                    // API 資料載入 (不依賴使用者點擊)
-                    fetchWeatherData(35.6895, 139.6917);
+                    // API 資料載入 (開啟 App 即自動抓取目前真實位置與天氣)
+                    updateLocation(true);
                     fetchExchangeRate();
                     const savedCheck = localStorage.getItem('tokyo_voyager_checklist_v7');
                     if (savedCheck) checklistCategories.value = JSON.parse(savedCheck);
