@@ -688,70 +688,7 @@
                     </template>
                 </button>
             </div>
-        </nav>
-
-        <!-- 全螢幕展開字卡 -->
-        <transition name="fade">
-            <div v-if="fullscreenPhrase" class="fixed inset-0 z-[200] bg-stone-900 flex items-center justify-center overflow-hidden">
-                <button @click="closeFullscreen" class="absolute top-6 right-6 z-[210] w-12 h-12 bg-white/10 border border-white/20 backdrop-blur-md rounded-full text-white active:scale-95 transition-transform"><i class="ph-light ph-x text-2xl"></i></button>
-                <div class="transform rotate-90 flex flex-col items-center justify-center text-center px-8 py-8" style="width: 100vh; height: 100vw;">
-                    <div class="flex-1 flex flex-col items-center justify-center w-full min-h-0">
-                        <p class="font-medium tracking-wide text-white leading-snug w-full whitespace-pre-wrap transition-all duration-300 overflow-y-auto hide-scrollbar"
-                           :class="fullscreenPhrase.ja.length > 30 ? 'text-[3.5vh]' : (fullscreenPhrase.ja.length > 15 ? 'text-[4.5vh]' : 'text-[6vh]')">
-                            {{ fullscreenPhrase.ja }}
-                        </p>
-                        <p class="tracking-widest text-stone-400 mt-6 font-light uppercase transition-all duration-300 shrink-0"
-                           :class="fullscreenPhrase.zh.length > 15 ? 'text-[1.8vh]' : 'text-[2.2vh]'">
-                            {{ fullscreenPhrase.zh }}
-                        </p>
-                    </div>
-                    <button @click="speakJapanese(fullscreenPhrase.ja)" class="shrink-0 mt-6 bg-white text-muji-ink px-10 py-4 rounded-full flex items-center gap-3 active:scale-95 shadow-lg">
-                        <i class="ph-fill ph-speaker-high text-2xl"></i>播放語音
-                    </button>
-                </div>
-            </div>
-        </transition>
-
-        <!-- SOS Modal (已修復找回) -->
-        <transition name="modal-fade">
-            <div v-if="showSOS" @click.self="closeSOS" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-[100] flex items-end justify-center">
-                <div class="modal-panel bg-muji-bg w-full max-w-md rounded-t-[32px] p-6 pb-12 shadow-2xl">
-                    <div class="flex justify-between items-center mb-8">
-                        <h2 class="text-lg font-medium tracking-widest text-muji-accent flex items-center gap-2"><i class="ph-bold ph-warning-circle"></i> 緊急求助</h2>
-                        <button @click="closeSOS" class="w-8 h-8 rounded-full bg-stone-200/50 flex items-center justify-center text-stone-500 active:scale-95 transition-all">
-                            <i class="ph-bold ph-x"></i>
-                        </button>
-                    </div>
-                
-                    <div class="bg-stone-800 text-stone-100 rounded-2xl p-6 mb-4 relative shadow-soft">
-                        <button @click="openFullscreen({ zh: '請帶我到這個地址', ja: 'すみません、この住所までお願いします。\n\n東京都台東区北上野2丁目25-7' })" class="absolute top-4 right-4 w-8 h-8 border border-stone-600 rounded-full flex items-center justify-center active:scale-95 hover:bg-stone-700">
-                            <i class="ph-light ph-corners-out text-stone-300"></i>
-                        </button>
-                        <p class="text-[10px] tracking-widest text-stone-400 mb-3">出示給司機</p>
-                        <p class="text-sm font-medium text-stone-300 mb-4 border-b border-stone-700 pb-4">すみません、この住所までお願いします。<br><span class="text-[10px] text-stone-500 font-light mt-1 inline-block">（不好意思，請載我到這個地址）</span></p>
-                        <p class="text-lg font-medium tracking-widest text-white leading-relaxed">東京都台東区<br>北上野2丁目25-7</p>
-                    </div>
-
-                    <div class="bg-white border border-stone-200 rounded-2xl p-5 mb-6 text-center relative shadow-soft">
-                        <button @click.stop="openFullscreen({ zh: '我迷路了，請幫幫我', ja: '道に迷ってしまいました。\n助けていただけませんか？' })" class="absolute top-4 right-4 w-8 h-8 bg-stone-50 border border-stone-200 rounded-full flex items-center justify-center active:scale-95 z-10 text-stone-400">
-                            <i class="ph-light ph-corners-out"></i>
-                        </button>
-                        <div @click="speakJapanese('道に迷ってしまいました。助けていただけませんか？')" class="active:opacity-50 transition-opacity pt-2">
-                            <p class="text-[10px] tracking-widest text-stone-400 mb-2">我迷路了，請幫幫我</p>
-                            <p class="text-base font-medium text-muji-accent leading-relaxed tracking-wide">道に迷ってしまいました。<br>助けていただけませんか？</p>
-                            <div class="mt-4 text-[10px] font-mono tracking-widest border border-stone-200 text-stone-400 inline-block px-3 py-1 rounded">點擊播放語音</div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <a href="tel:110" @click="playSound('pop')" class="bg-white border border-stone-200 py-4 rounded-2xl font-medium tracking-widest text-[11px] text-muji-ink flex flex-col items-center gap-2 active:bg-stone-50 shadow-soft"><i class="ph-light ph-police-car text-2xl text-stone-400"></i> 報警 110</a>
-                        <a href="tel:119" @click="playSound('pop')" class="bg-white border border-stone-200 py-4 rounded-2xl font-medium tracking-widest text-[11px] text-muji-ink flex flex-col items-center gap-2 active:bg-stone-50 shadow-soft"><i class="ph-light ph-ambulance text-2xl text-stone-400"></i> 救護 119</a>
-                    </div>
-                </div>
-            </div>
-        </transition>
-
-        <!-- Guide Modal (已修復找回) -->
+        <!-- Guide Modal (已修復找回完整4步驟) -->
         <transition name="modal-fade">
             <div v-if="showGuide" @click.self="closeGuide" class="fixed inset-0 bg-stone-900/40 backdrop-blur-sm z-[100] flex items-end justify-center">
                 <div class="modal-panel bg-muji-bg w-full max-w-md h-[85vh] rounded-t-[32px] shadow-2xl flex flex-col">
@@ -774,10 +711,11 @@
                             </div>
                         </div>
 
+                        <!-- STEP 1: 台灣出境 -->
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-muji-tech text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 1</span>
-                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">出發地機場出境</h3>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">台灣機場出境</h3>
                             </div>
                             <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
                                 <div class="space-y-6 relative">
@@ -790,21 +728,27 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">隨身行李安檢</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">把水壺的水倒光。將<span class="text-muji-ink font-medium">筆電、平板、雨傘</span>拿出來單獨放在塑膠籃裡。脫下外套並<span class="text-muji-accent font-medium">清空口袋</span>，走過金屬探測門。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">把水壺的水倒光或喝掉。將<span class="text-muji-ink font-medium">筆電、平板、雨傘</span>拿出來單獨放在塑膠籃裡。脫下外套與金屬皮帶，並<span class="text-muji-accent font-medium">清空口袋</span>，走過金屬探測門。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">證件查驗 (過海關)</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">走自動通關通道。將護照有照片那面朝下放上機台，脫下口罩看鏡頭即可通關。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">走自動通關通道。<span class="text-muji-accent font-medium">第一次出國不用事前排隊申請！</span>直接將護照有照片那面朝下放上機台，脫下口罩看鏡頭並按壓指紋，即可「同時完成註冊與通關」。</p>
+                                    </div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">4</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">前往登機門</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">查看登機證上的 Gate (登機門) 號碼，並在<span class="text-muji-ink font-medium">起飛前 30 分鐘</span>抵達登機門等待廣播登機。</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- STEP 2: 日本入境 -->
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-muji-accent text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 2</span>
-                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達目的地入境</h3>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達日本入境</h3>
                             </div>
                             <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
                                 <div class="space-y-6 relative">
@@ -812,17 +756,73 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">檢疫與入境審查</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed"><span class="text-muji-ink font-medium">排外國人專用通道。</span>準備好線上入境條碼與護照。在櫃檯脫下帽子與口罩，依指示按壓指紋並拍照。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed"><span class="text-muji-ink font-medium">觀光客需排外國人專用通道（不能走日本的自動通關）。</span>手機先開好 <span class="text-blue-600 font-medium border-b border-blue-200">Visit Japan Web (VJW) 條碼</span> 與護照。在櫃檯脫下帽子與口罩，將<span class="text-muji-accent font-medium">雙手食指平壓在發光的機器上</span>，並直視前方小螢幕拍照。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
-                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">領取行李</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">看大螢幕尋找自己的航班號碼，確認轉盤號碼後前往領取託運行李。</p>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">領取行李 (Baggage Claim)</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">看大螢幕尋找自己的航班號碼（如：TR 866），確認對應的轉盤號碼後，前往拿取託運行李。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">海關申報 (稅關)</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">在電子機台掃描護照與條碼。接著<span class="text-muji-accent font-medium">同行者可一起推著行李走到出口閘門</span>，即可正式入境！</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">先去旁邊的電子機台掃描護照與 VJW 條碼。接著<span class="text-muji-accent font-medium">同行者可一起推著行李走到出口閘門</span>，確認無違禁品後，即可正式入境日本！</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: 日本出境 -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-stone-600 text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 3</span>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">日本機場出境</h3>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
+                                <div class="space-y-6 relative">
+                                    <div class="absolute left-2.5 top-2 bottom-2 w-[1px] bg-stone-200"></div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">櫃檯報到與託運</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">持護照換登機證並託運行李。<span class="text-muji-accent font-medium">注意：布丁、果凍、超過 100ml 的液體免稅品（如大罐保養品、酒類）絕對不能手提，必須放進大行李箱託運！</span></p>
+                                    </div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">隨身行李安檢</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">與台灣相同，水壺需倒空，筆電與平板需單獨拿出過 X 光機。</p>
+                                    </div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">海關 (稅關) 與出境</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">若有購買免稅品，在過自動通關前找「免稅手續機台」掃描護照。接著跟台灣一樣，將護照放上機台掃描並辨識臉部出境。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: 台灣入境 -->
+                        <div>
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-muji-tech text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 4</span>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達台灣入境</h3>
+                            </div>
+                            <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
+                                <div class="space-y-6 relative">
+                                    <div class="absolute left-2.5 top-2 bottom-2 w-[1px] bg-stone-200"></div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">入境查驗</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">準備好護照，走「自動通關」閘門掃描臉部即可快速入境。</p>
+                                    </div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">領取行李</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">至螢幕標示的轉盤領取託運行李。</p>
+                                    </div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">動植物檢疫與海關</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed"><span class="text-muji-accent font-medium">絕對不可攜帶肉乾、新鮮水果、含肉塊泡麵等違禁品！</span>若不確定買的伴手禮能不能帶，<span class="text-muji-ink font-medium">請主動走「紅線應申報檯」詢問海關</span>，避免面臨高額罰款。確認無誤後即可離開機場，歡迎回家！</p>
                                     </div>
                                 </div>
                             </div>
