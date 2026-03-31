@@ -51,7 +51,7 @@
         .app-container { max-width: 480px; margin: 0 auto; background-color: #F9F8F6; min-height: 100vh; position: relative; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease-out; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
         
         /* 動畫曲線優化：彈簧、平滑與無限縮放 */
@@ -78,14 +78,16 @@
 <body class="text-muji-ink font-sans antialiased selection:bg-stone-200">
     <div id="app" class="app-container flex flex-col">
         
-        <!-- 🚀 啟動畫面 (Splash Screen) - 自動播放 -->
+        <!-- 🚀 啟動畫面 (Splash Screen) - 完美置中設計 -->
         <transition name="splash-fade">
-            <div v-if="showSplash" class="fixed inset-0 z-[9999] bg-muji-bg flex items-center justify-center flex-col overflow-hidden pointer-events-none">
+            <div v-if="showSplash" class="fixed inset-0 z-[9999] bg-muji-bg flex items-center justify-center overflow-hidden pointer-events-none">
+                
+                <!-- 彈性群組容器：將圖形與文字綁定，利用 Flex 特性自動保持四向視覺絕對中心 -->
                 <div class="flex items-center justify-center">
                     
-                    <!-- 圖形標誌 -->
-                    <svg :class="splashStep >= 1 ? 'opacity-100 scale-100 translate-x-0' : 'opacity-0 scale-75 translate-x-6'" 
-                         class="transform transition-all duration-[1000ms] ease-spring drop-shadow-sm w-[42px] h-[42px] overflow-visible" 
+                    <!-- 圖形標誌 (SVG) -->
+                    <svg :class="splashStep >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'" 
+                         class="transform transition-all duration-[1000ms] ease-spring drop-shadow-sm w-[42px] h-[42px] overflow-visible shrink-0" 
                          viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         
                         <!-- 黑色柱體 (Step 3 時會提早淡出) -->
@@ -94,24 +96,25 @@
                             <rect x="13.5" y="12.5" width="5.5" height="7.5" rx="2.75" fill="#8E8D8A"/>
                         </g>
 
-                        <!-- 朱色紅點 (Step 3 時進行 300 倍無限放大轉場) -->
+                        <!-- 朱色紅點 (Step 3 時進行無限放大轉場) -->
                         <g class="transition-transform duration-[800ms] ease-zoom"
                            :style="splashStep >= 3 ? 'transform-origin: 16.25px 8px; transform: scale(300);' : 'transform-origin: 16.25px 8px; transform: scale(1);'">
                             <circle cx="16.25" cy="8" r="2.75" fill="#E83929"/>
                         </g>
                     </svg>
                     
-                    <!-- 文字標誌 (展開與淡出動畫獨立) -->
-                    <div :class="splashStep >= 2 ? 'max-w-[200px] ml-3.5' : 'max-w-0 ml-0'" 
-                         class="overflow-hidden transition-all duration-[1000ms] ease-out-expo">
+                    <!-- 文字標誌 (由寬度0滑順展開，緊密貼合真實寬度約 72px，消除右側空白視覺偏差) -->
+                    <div :class="splashStep >= 2 ? 'w-[72px] opacity-100 ml-3.5' : 'w-0 opacity-0 ml-0'" 
+                         class="overflow-hidden transition-all duration-[1000ms] ease-out-expo shrink-0 flex flex-col items-start justify-center">
                         <!-- Step 3 準備紅點轉場時，文字會優雅淡出 -->
                         <div :class="splashStep >= 3 ? 'opacity-0' : 'opacity-100'" 
-                             class="flex flex-col items-start justify-center pt-1 w-[120px] transition-opacity duration-300">
-                            <h1 class="text-[28px] font-bold tracking-[0.2em] text-muji-ink leading-none">伴旅</h1>
-                            <p class="text-[10px] font-bold tracking-[0.35em] text-stone-400 uppercase mt-2 leading-none">COTABI</p>
+                             class="flex flex-col items-start justify-center pt-1 transition-opacity duration-300 w-[72px]">
+                            <h1 class="text-[28px] font-bold tracking-[0.2em] text-muji-ink leading-none whitespace-nowrap">伴旅</h1>
+                            <p class="text-[10px] font-bold tracking-[0.35em] text-stone-400 uppercase mt-2 leading-none whitespace-nowrap">COTABI</p>
                         </div>
                     </div>
                 </div>
+
             </div>
         </transition>
 
@@ -877,23 +880,40 @@
         // --- Web Audio API 合成器 (獨立於 Vue) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
+        let isAudioUnlocked = false;
 
-        const initAudio = () => {
-            if (!audioCtx) { audioCtx = new AudioContext(); }
-            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
-        };
-
-        // 監聽全局觸控/點擊以自動解鎖音頻上下文 (防止首次播放被靜音)
+        // 靜音解鎖大法：手機端點擊後，強迫生成無聲音軌解鎖播放權限
         const unlockAudio = () => {
-            initAudio();
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('touchstart', unlockAudio);
+            if (isAudioUnlocked) return;
+            if (!audioCtx) audioCtx = new AudioContext();
+            
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const buffer = audioCtx.createBuffer(1, 1, 22050);
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            if (source.start) source.start(0);
+
+            isAudioUnlocked = true;
+            document.removeEventListener('touchstart', unlockAudio, true);
+            document.removeEventListener('touchend', unlockAudio, true);
+            document.removeEventListener('click', unlockAudio, true);
         };
-        document.addEventListener('click', unlockAudio);
-        document.addEventListener('touchstart', unlockAudio);
+        
+        // 全域監聽使用者的任何第一次互動
+        document.addEventListener('touchstart', unlockAudio, true);
+        document.addEventListener('touchend', unlockAudio, true);
+        document.addEventListener('click', unlockAudio, true);
 
         const playTone = (freq, type, duration, vol = 0.05) => {
-            if (!audioCtx || audioCtx.state === 'suspended') return;
+            if (!audioCtx) return;
+            // 每次播放前確保 context 沒被重新掛起 (iOS 偶發狀況)
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().catch(() => {});
+            }
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = type;
@@ -919,8 +939,10 @@
                 setTimeout(() => playTone(783.99, 'sine', 2.0, 0.05), 300); // G5
                 setTimeout(() => playTone(987.77, 'sine', 2.5, 0.05), 450); // B5
             },
-            transition: () => { // 紅點放大轉場 (明亮、喜悅的向上琶音展開)
-                if (!audioCtx || audioCtx.state === 'suspended') return;
+            transition: () => { // 紅點放大轉場 (明亮、喜悅的向上魔法琶音)
+                if (!audioCtx) return;
+                if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+                
                 const playChime = (freq, delay) => {
                     const osc = audioCtx.createOscillator();
                     const gain = audioCtx.createGain();
@@ -1149,6 +1171,17 @@
                     if (activeTab.value !== id) {
                         activeTab.value = id;
                         playSound('pop');
+                        
+                        // 配合 150ms 淡出動畫，在畫面隱藏的瞬間將捲動軸「瞬間」重置回最上方
+                        setTimeout(() => {
+                            if (mainScrollArea.value) {
+                                mainScrollArea.value.classList.remove('scroll-smooth'); // 暫時移除平滑滾動以達到瞬間切換
+                                mainScrollArea.value.scrollTop = 0;
+                                setTimeout(() => {
+                                    if (mainScrollArea.value) mainScrollArea.value.classList.add('scroll-smooth');
+                                }, 50); // 恢復平滑滾動屬性
+                            }
+                        }, 150);
                     }
                 };
 
@@ -1339,7 +1372,9 @@
                 // --- 6. 生命周期 ---
                 onMounted(() => {
                     // 自動嘗試初始化音效 (在 PWA 或已信任網域中會直接成功)
-                    initAudio();
+                    if (window.AudioContext || window.webkitAudioContext) {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    }
 
                     // --- 啟動畫面動畫序列全自動執行 ---
                     setTimeout(() => { splashStep.value = 1; sfx.splash(); }, 200);   
