@@ -8,7 +8,6 @@
     <!-- 加入網站 Icon 與手機主畫面 Icon 設定 -->
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-    <!-- 設定手機瀏覽器頂部狀態列的顏色 (對應暖米白背景) -->
     <meta name="theme-color" content="#F9F8F6">
 
     <!-- Tailwind CSS -->
@@ -29,19 +28,19 @@
                     },
                     colors: {
                         muji: {
-                            bg: '#F9F8F6', // 暖米白
+                            bg: '#F9F8F6', 
                             card: '#FFFFFF',
-                            ink: '#2C2C2C', // 碳墨黑
-                            sub: '#8E8D8A', // 暖灰
-                            accent: '#E83929', // 日本朱紅
-                            tech: '#4A5D75'  // 沉穩科技藍
+                            ink: '#2C2C2C', 
+                            sub: '#8E8D8A', 
+                            accent: '#E83929', 
+                            tech: '#4A5D75'  
                         }
                     },
                     boxShadow: {
                         'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.03)',
                         'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
                         'float': '0 8px 30px -4px rgba(0, 0, 0, 0.15)',
-                        'spotlight': '0 0 0 4000px rgba(28, 25, 23, 0.85)' /* 加深背景讓聚光燈更明顯 */
+                        'spotlight': '0 0 0 4000px rgba(28, 25, 23, 0.75)' 
                     }
                 }
             }
@@ -54,59 +53,43 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease-out; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
-        
-        /* 動畫曲線優化：彈簧、平滑與無限縮放 */
         .ease-spring { transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1); }
         .ease-out-expo { transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1); }
         .ease-zoom { transition-timing-function: cubic-bezier(0.85, 0, 0.15, 1); }
-
-        /* SOS & Guide 面板專屬滑動與漸變動畫 */
-        .modal-fade-enter-active, .modal-fade-leave-active { transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .modal-fade-enter-from, .modal-fade-leave-to { opacity: 0; }
-        .modal-fade-enter-active .modal-panel, .modal-fade-leave-active .modal-panel { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .modal-fade-enter-from .modal-panel, .modal-fade-leave-to .modal-panel { transform: translateY(100%); }
-
-        /* Splash Screen 專屬退場動畫 */
         .splash-fade-leave-active { transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
         .splash-fade-leave-to { opacity: 0; }
-
         .cursor-grabbing { cursor: grabbing !important; }
-        
-        /* 毛玻璃共用類別 */
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(255, 255, 255, 0.8); }
-        
-        /* Vault PIN 游標顏色 */
         input[type="password"] { caret-color: #2C2C2C; }
+        
+        /* 教學氣泡小箭頭邊框修正 */
+        .tutorial-arrow::after {
+            content: '';
+            position: absolute;
+            width: 0; height: 0;
+            border-style: solid;
+        }
     </style>
 </head>
 <body class="text-muji-ink font-sans antialiased selection:bg-stone-200">
     <div id="app" class="app-container flex flex-col">
         
-        <!-- 🚀 啟動畫面 (Splash Screen) - 完美置中設計 -->
+        <!-- 🚀 啟動畫面 (Splash Screen) -->
         <transition name="splash-fade">
             <div v-if="showSplash" class="fixed inset-0 z-[9999] bg-muji-bg flex items-center justify-center overflow-hidden pointer-events-none">
-                
-                <!-- 彈性群組容器 -->
                 <div class="flex items-center justify-center">
-                    
-                    <!-- 圖形標誌 (SVG) -->
                     <svg :class="splashStep >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'" 
                          class="transform transition-all duration-[1000ms] ease-spring drop-shadow-sm w-[42px] h-[42px] overflow-visible shrink-0" 
                          viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        
                         <g :class="splashStep >= 3 ? 'opacity-0' : 'opacity-100'" class="transition-opacity duration-300">
                             <rect x="5" y="4" width="5.5" height="16" rx="2.75" fill="#2C2C2C"/>
                             <rect x="13.5" y="12.5" width="5.5" height="7.5" rx="2.75" fill="#8E8D8A"/>
                         </g>
-
-                        <!-- 朱色紅點轉場 -->
                         <g class="transition-transform duration-[800ms] ease-zoom"
                            :style="splashStep >= 3 ? 'transform-origin: 16.25px 8px; transform: scale(300);' : 'transform-origin: 16.25px 8px; transform: scale(1);'">
                             <circle cx="16.25" cy="8" r="2.75" fill="#E83929"/>
                         </g>
                     </svg>
-                    
-                    <!-- 文字標誌 -->
                     <div :class="splashStep >= 2 ? 'w-[72px] opacity-100 ml-3.5' : 'w-0 opacity-0 ml-0'" 
                          class="overflow-hidden transition-all duration-[1000ms] ease-out-expo shrink-0 flex flex-col items-start justify-center">
                         <div :class="splashStep >= 3 ? 'opacity-0' : 'opacity-100'" 
@@ -116,70 +99,58 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </transition>
 
-        <!-- 💡 動態聚光燈教學導覽 (Dynamic Spotlight Tutorial) -->
+        <!-- 💡 動態聚光燈與氣泡教學導覽 (Smart Tooltip Tutorial) -->
         <transition name="fade">
             <div v-if="showTutorialOverlay" class="fixed inset-0 z-[9999] pointer-events-auto overflow-hidden" @click="nextTutorialStep">
-                <!-- 遮罩層 -->
                 <div class="absolute inset-0 bg-transparent"></div>
-
-                <!-- 跳過教學按鈕 -->
-                <button @click.stop="closeTutorial" class="fixed top-6 left-6 text-white text-[11px] font-medium tracking-widest bg-stone-800/60 px-4 py-2 rounded-full backdrop-blur-md active:scale-95 z-50 transition-colors border border-white/10 hover:bg-stone-800/80">
+                <button @click.stop="closeTutorial" class="fixed top-6 left-6 text-white text-[11px] font-medium tracking-widest bg-stone-800/40 px-4 py-2 rounded-full backdrop-blur-md active:scale-95 z-50 transition-colors border border-white/10 hover:bg-stone-800/60">
                     跳過教學
                 </button>
 
-                <!-- 聚光燈 (透明挖洞區域) -->
-                <div class="fixed rounded-[24px] transition-all duration-[500ms] ease-spring pointer-events-none shadow-spotlight" 
+                <!-- 聚光燈挖洞 -->
+                <div class="fixed rounded-[16px] transition-all duration-[400ms] ease-out pointer-events-none shadow-spotlight" 
                      :style="spotlightStyle">
                 </div>
                 
-                <!-- 教學說明字卡 (絕對安全區定位，避免出框) -->
-                <div class="fixed transition-all duration-[500ms] ease-spring pointer-events-none flex flex-col items-center justify-center w-full px-5 left-0" 
-                     :style="tooltipStyle">
-                    <div class="bg-muji-bg rounded-[24px] p-6 shadow-2xl relative w-full max-w-[340px] mx-auto border border-white/50 pointer-events-auto">
-                        
-                        <!-- 步驟進度標籤 -->
-                        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-muji-ink text-white text-[10px] font-mono tracking-widest px-3 py-1 rounded-full shadow-sm whitespace-nowrap">
-                            STEP {{ tutorialStep + 1 }} / {{ tutorialSteps.length }}
-                        </div>
-
-                        <!-- 動態圖示 -->
-                        <div class="w-14 h-14 rounded-full bg-white shadow-soft flex items-center justify-center mb-4 mt-2 mx-auto border border-stone-100">
-                            <i :class="['ph-fill text-3xl', tutorialSteps[tutorialStep].icon]"></i>
-                        </div>
-                        
-                        <h3 class="text-lg font-bold text-muji-ink mb-2 tracking-wide text-center">{{ tutorialSteps[tutorialStep].title }}</h3>
-                        <p class="text-[13px] text-muji-sub leading-relaxed font-light text-center px-1">{{ tutorialSteps[tutorialStep].desc }}</p>
-                        
-                        <!-- 底部進度指示與按鈕 -->
-                        <div class="mt-6 flex flex-col items-center justify-center border-t border-stone-200/60 pt-5 gap-3">
-                            <div class="flex gap-1.5 max-w-full flex-wrap justify-center px-2">
-                                <div v-for="(_, idx) in tutorialSteps" :key="idx" 
-                                     class="h-1.5 rounded-full transition-all duration-300"
-                                     :class="tutorialStep === idx ? 'w-4 bg-muji-ink' : 'w-1.5 bg-stone-300'">
-                                </div>
+                <!-- 精準指向氣泡 (Tooltip) -->
+                <div class="fixed transition-all duration-[400ms] ease-out z-50 pointer-events-none flex flex-col" :style="tooltipStyle">
+                    <!-- 指示小箭頭 -->
+                    <div class="absolute w-0 h-0 transition-all duration-[400ms] z-10" :style="arrowStyle"></div>
+                    
+                    <!-- 說明卡片 -->
+                    <div class="bg-white rounded-[20px] p-5 shadow-2xl border border-stone-200 pointer-events-auto relative w-full">
+                        <div class="flex items-start gap-3.5 mb-2">
+                            <div class="w-10 h-10 rounded-full bg-stone-50 flex items-center justify-center shrink-0 border border-stone-100">
+                                <i :class="['ph-fill text-xl', tutorialSteps[tutorialStep].icon]"></i>
                             </div>
-                            <div class="text-xs font-medium tracking-widest bg-muji-accent text-white px-6 py-2.5 rounded-xl shadow-soft animate-[pulse_2s_ease-in-out_infinite] mt-2">
-                                {{ tutorialStep === tutorialSteps.length - 1 ? '🎉 開始體驗' : '點擊畫面繼續' }}
+                            <div class="flex-1 pt-0.5">
+                                <!-- 修正文字顏色與粗細，確保長輩能清晰閱讀 -->
+                                <h3 class="text-base font-bold text-muji-ink mb-1.5 tracking-wide leading-tight">{{ tutorialSteps[tutorialStep].title }}</h3>
+                                <p class="text-[13.5px] text-stone-700 leading-relaxed font-medium">{{ tutorialSteps[tutorialStep].desc }}</p>
                             </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-5 border-t border-stone-100 pt-3.5">
+                            <span class="text-[11px] font-mono text-stone-400 font-bold tracking-widest">{{ tutorialStep + 1 }} / {{ tutorialSteps.length }}</span>
+                            <button @click.stop="nextTutorialStep" class="bg-muji-ink text-white text-[13px] px-6 py-2.5 rounded-lg active:scale-95 transition-transform font-medium tracking-widest shadow-sm">
+                                {{ tutorialStep === tutorialSteps.length - 1 ? '完成' : '繼續' }}
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </transition>
 
-        <!-- Header: 伴旅品牌識別設計 (固定鎖定) -->
+        <!-- Header -->
         <header class="bg-muji-bg/90 backdrop-blur-md sticky top-0 z-50 px-6 py-4 grid grid-cols-3 items-center border-b border-stone-200/50">
-            <!-- Left: 日期 -->
             <div class="flex flex-col">
                 <p class="text-[10px] text-muji-sub font-medium tracking-wider whitespace-nowrap">{{ currentDateShort }}</p>
                 <p class="text-[9px] text-stone-400 font-mono uppercase">{{ currentDayOfWeek }}</p>
             </div>
             
-            <!-- Center: 品牌主標誌 (點擊回頂部，加入 ID 供教學定位) -->
             <div id="header-logo" class="flex items-center justify-center gap-2.5 relative select-none cursor-pointer active:scale-95 transition-transform" @click="scrollToTop">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0 drop-shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
                     <rect x="5" y="4" width="5.5" height="16" rx="2.75" fill="#2C2C2C"/>
@@ -192,9 +163,8 @@
                 </div>
             </div>
 
-            <!-- Right: 功能按鈕 -->
             <div class="flex items-center justify-end gap-2.5">
-                <button id="btn-tutorial" @click="openTutorial" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all text-muji-sub hover:text-muji-ink bg-stone-200/40">
+                <button @click="openTutorial" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all text-muji-sub hover:text-muji-ink bg-stone-200/40">
                     <i class="ph-bold ph-question text-base"></i>
                 </button>
                 <button id="btn-font" @click="toggleFontSize" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all text-muji-sub hover:text-muji-ink bg-stone-200/40">
@@ -214,10 +184,9 @@
         <main ref="mainScrollArea" class="flex-1 overflow-y-auto hide-scrollbar pb-32 relative scroll-smooth">
             <transition name="fade" mode="out-in">
                 
-                <!-- Tab: 總覽 Dashboard -->
+                <!-- Tab: 首頁 -->
                 <div v-if="activeTab === 'home'" key="home" class="px-5 pt-6 space-y-6">
                     
-                    <!-- 天氣管家卡片 -->
                     <div id="weather-card" class="bg-stone-800 rounded-2xl p-6 text-stone-50 shadow-soft relative overflow-hidden transition-all duration-300">
                         <div class="absolute -right-8 -top-8 opacity-5 pointer-events-none">
                             <i :class="['ph-fill text-[160px]', weatherInfo.bgIcon]"></i>
@@ -292,7 +261,7 @@
                                 }">
                                     <template v-if="isFetchingRate">更新中...</template>
                                     <template v-else-if="updateStatus === 'success'">已更新</template>
-                                    <template v-else-if="updateStatus === 'error'">使用上次紀錄</template>
+                                    <template v-else-if="updateStatus === 'error'">使用紀錄</template>
                                     <template v-else>{{ rateLastUpdated }}</template>
                                 </span>
                             </div>
@@ -344,7 +313,7 @@
                     </div>
                 </div>
 
-                <!-- Tab: 行程表 Itinerary -->
+                <!-- Tab: 行程表 -->
                 <div v-else-if="activeTab === 'itinerary'" key="itinerary" class="px-5 pt-6 space-y-6">
                     <div class="mb-2">
                         <h2 class="text-lg font-bold text-muji-ink tracking-wide">旅程規劃</h2>
@@ -363,8 +332,7 @@
                     <div class="space-y-6 mt-2 relative">
                         <div class="absolute left-[23px] top-4 bottom-4 w-[1px] bg-stone-200"></div>
                         
-                        <div v-for="(item, index) in currentDayItinerary.spots" :key="item.id" 
-                             class="relative pl-14 pr-2">
+                        <div v-for="(item, index) in currentDayItinerary.spots" :key="item.id" class="relative pl-14 pr-2">
                             <div class="absolute left-[19px] top-1.5 w-2.5 h-2.5 rounded-full border-2 border-muji-bg bg-white" 
                                  :class="item.type === 'food' ? 'ring-1 ring-muji-accent' : 'ring-1 ring-stone-400'"></div>
                             
@@ -382,14 +350,13 @@
                     </div>
                 </div>
 
-                <!-- Tab: 工具箱 Tools -->
+                <!-- Tab: 工具箱 -->
                 <div v-else-if="activeTab === 'tools'" key="tools" class="px-5 pt-6 space-y-8 pb-10">
                     <div class="mb-2">
                         <h2 class="text-lg font-bold text-muji-ink tracking-wide">實用工具</h2>
                         <p class="text-[11px] text-stone-400 mt-1 tracking-widest uppercase font-mono">Toolkit</p>
                     </div>
 
-                    <!-- 機場通關懶人包入口 -->
                     <button id="tools-guide" @click="openGuide" class="w-full bg-gradient-to-r from-muji-tech to-stone-600 rounded-2xl p-5 shadow-soft border border-stone-200/50 flex items-center justify-between group active:scale-[0.98] transition-all">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
@@ -408,7 +375,7 @@
                             <i class="ph-bold ph-translate text-muji-tech"></i> 隨身翻譯字卡
                         </h2>
                         <div class="space-y-3">
-                            <div v-for="phrase in phrases.slice(0, 3)" :key="phrase.id" class="bg-muji-card rounded-2xl p-4 shadow-soft border border-stone-100 flex items-center justify-between transition-colors">
+                            <div v-for="phrase in phrases" :key="phrase.id" class="bg-muji-card rounded-2xl p-4 shadow-soft border border-stone-100 flex items-center justify-between transition-colors">
                                 <div class="flex-1 pr-2 active:opacity-50" @click="speakJapanese(phrase.ja)">
                                     <p class="text-[11px] font-medium tracking-wide text-stone-400 mb-1.5">{{ phrase.zh }}</p>
                                     <p class="text-[15px] font-medium text-muji-ink tracking-wide leading-snug">{{ phrase.ja }}</p>
@@ -422,15 +389,34 @@
                                     </button>
                                 </div>
                             </div>
-                            <p class="text-center text-[10px] text-stone-400 mt-2 tracking-widest">（向下滑動查看更多...）</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h2 class="text-xs font-bold tracking-widest text-muji-sub mb-4 flex items-center gap-2">
+                            <i class="ph-bold ph-receipt"></i> 免稅退稅指南
+                        </h2>
+                        <div class="bg-white rounded-2xl p-5 border border-stone-200 shadow-soft">
+                            <ul class="space-y-4">
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-0.5 w-1.5 h-1.5 rounded-full bg-muji-ink shrink-0 translate-y-1.5"></div>
+                                    <span class="text-[13px] text-muji-ink font-light leading-relaxed">單店消費滿 <span class="font-mono font-medium border-b border-stone-300 pb-0.5">¥5,000</span> (不含稅) 即可退稅。</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-0.5 w-1.5 h-1.5 rounded-full bg-muji-ink shrink-0 translate-y-1.5"></div>
+                                    <span class="text-[13px] text-muji-ink font-light leading-relaxed">結帳時必須出示 <span class="font-medium">護照正本</span> (影本/照片無效)。</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <div class="mt-0.5 w-1.5 h-1.5 rounded-full bg-muji-accent shrink-0 translate-y-1.5"></div>
+                                    <span class="text-[13px] text-muji-ink font-light leading-relaxed"><span class="text-muji-accent font-medium">消耗品</span> (藥妝/食品) 會被封入免稅袋，離開當地前絕對不可拆封。</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tab: 行前清單 Checklist -->
+                <!-- Tab: 行前清單 -->
                 <div v-else-if="activeTab === 'checklist'" key="checklist" class="relative min-h-[90vh]">
-                    
-                    <!-- 各類別清單區塊 -->
                     <div class="px-5 pt-6 pb-8 space-y-8">
                         <div class="mb-2">
                             <h2 class="text-lg font-bold text-muji-ink tracking-wide">行前準備清單</h2>
@@ -442,7 +428,6 @@
                                 <i :class="['ph-bold', category.icon, 'text-muji-sub text-sm']"></i> {{ category.title }}
                             </h2>
                             <div class="bg-muji-card rounded-2xl shadow-soft border border-stone-200 overflow-hidden">
-                                <!-- 既有與自訂項目列表 -->
                                 <div v-for="(item, idx) in category.items" :key="item.id"
                                      @click="toggleCheck(category.id, item.id)"
                                      class="flex items-start gap-3.5 p-4 border-b border-stone-100 last:border-b-0 active:bg-stone-50 transition-colors cursor-pointer group">
@@ -462,7 +447,6 @@
                                             {{ item.note }}
                                         </p>
                                         
-                                        <!-- 連結按鈕 -->
                                         <div v-if="(item.action || item.tutorial) && !item.checked" class="mt-3 flex flex-wrap gap-2">
                                             <a v-if="item.action" :href="item.action.url" target="_blank" @click.stop class="text-[10px] bg-stone-100 border border-stone-200 text-muji-ink px-3 py-1.5 rounded transition-all font-medium tracking-widest flex items-center gap-1.5 active:scale-95 hover:bg-stone-200 relative z-10">
                                                 <i class="ph-bold ph-link text-xs"></i>{{ item.action.text }}
@@ -472,22 +456,31 @@
                                             </a>
                                         </div>
                                     </div>
-
                                     <button v-if="item.id.startsWith('custom-')" @click.stop="removeCustomItem(category.id, item.id)" class="text-stone-300 hover:text-muji-accent active:scale-95 transition-all p-1 relative z-10">
                                         <i class="ph-bold ph-x"></i>
                                     </button>
                                 </div>
+                                <div v-if="addingItemForCategory !== category.id" 
+                                     @click="prepareAddItem(category.id)" 
+                                     class="p-3 text-center border-t border-stone-100 text-[11px] text-stone-400 font-medium tracking-widest cursor-pointer hover:bg-stone-50 transition-colors relative z-10">
+                                    <i class="ph-bold ph-plus mr-1"></i> 新增準備項目
+                                </div>
+                                <div v-else class="p-3 border-t border-stone-100 bg-stone-50 flex items-center gap-2">
+                                    <input v-model="newItemText" @keyup.enter="addCustomItem(category.id)" placeholder="輸入項目..." 
+                                           class="flex-1 bg-white border border-stone-200 rounded-lg px-3 py-2 text-xs text-muji-ink focus:outline-none focus:border-muji-sub focus:ring-1 focus:ring-muji-sub transition-all" autofocus>
+                                    <button @click="addCustomItem(category.id)" class="bg-muji-ink text-white px-4 py-2 rounded-lg text-xs font-medium tracking-widest active:scale-95 transition-transform">新增</button>
+                                    <button @click="addingItemForCategory = null; playSound('pop')" class="text-stone-400 p-2"><i class="ph-bold ph-x text-sm"></i></button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 貼心提醒小卡 -->
                         <div class="rounded-2xl p-5 border shadow-inner-soft mt-8 mb-4 transition-all duration-500"
                              :class="checklistProgress === 100 ? 'bg-green-50 border-green-100 text-green-700' : 'bg-stone-50 border-stone-200 text-stone-500'">
                             <p v-if="checklistProgress === 100" class="text-xs font-medium leading-relaxed tracking-wide text-center flex items-center justify-center gap-2">
-                                <i class="ph-fill ph-sparkle text-lg"></i> 恭喜！準備齊全，準備出發囉！
+                                <i class="ph-fill ph-sparkle text-lg"></i> 恭喜！準備齊全，隨時可以出發囉！
                             </p>
                             <p v-else class="text-[11px] font-light leading-relaxed tracking-wide text-center">
-                                「出發前確認以上項目都有打勾，就能安心享受這趟旅程囉！」
+                                「出發前確認以上項目都有打勾，就能安心享受旅程囉！」
                             </p>
                         </div>
                     </div>
@@ -506,7 +499,7 @@
                     </div>
                 </div>
 
-                <!-- Tab 4: 保險箱 Vault -->
+                <!-- Tab: 保險箱 -->
                 <div v-else-if="activeTab === 'vault'" key="vault" class="px-5 pt-6 space-y-6">
                     <div class="mb-2">
                         <h2 class="text-lg font-bold text-muji-ink tracking-wide">隱私保險箱</h2>
@@ -518,7 +511,7 @@
                             <i class="ph-light ph-lock-key text-2xl text-stone-400"></i>
                         </div>
                         <h2 class="text-lg font-medium tracking-widest text-muji-ink mb-2">隱私資訊解鎖</h2>
-                        <p class="text-xs text-stone-400 mb-8 tracking-wide font-light">請輸入領隊設定的 4 位數密碼</p>
+                        <p class="text-xs text-stone-400 mb-8 tracking-wide font-light">請輸入設定的 4 位數密碼</p>
                         
                         <div class="mb-8 relative z-10">
                             <input type="password" inputmode="numeric" pattern="[0-9]*" v-model="pinInput" maxlength="4" 
@@ -527,12 +520,158 @@
                         <button @click="unlockVault" class="bg-muji-ink text-white px-10 py-3 rounded-full text-sm font-medium tracking-widest active:scale-95 transition-transform shadow-soft relative z-10">解鎖</button>
                         <p v-if="pinError" class="text-muji-accent text-xs mt-4 tracking-wide text-center">{{ pinError }}</p>
                     </div>
+
+                    <div v-else class="space-y-8 animate-[slideUp_0.3s_ease-out] pb-10">
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xs font-bold tracking-widest text-muji-sub flex items-center gap-2">
+                                    <i class="ph-bold ph-airplane-tilt"></i> 航班資訊
+                                </h2>
+                                <button @click="lockVault" class="text-[10px] text-stone-400 border border-stone-200 px-2 py-1 rounded tracking-widest hover:bg-stone-50 transition-colors">鎖定</button>
+                            </div>
+                            
+                            <!-- 去程卡片 -->
+                            <div class="bg-white rounded-2xl shadow-soft border border-stone-200 overflow-hidden">
+                                <div class="bg-stone-50/50 p-5 flex justify-between items-center border-b border-stone-200 border-dashed relative">
+                                    <div class="absolute -left-3 -bottom-3 w-6 h-6 bg-muji-bg rounded-full border-t border-r border-stone-200"></div>
+                                    <div class="absolute -right-3 -bottom-3 w-6 h-6 bg-muji-bg rounded-full border-t border-l border-stone-200"></div>
+                                    
+                                    <div class="text-center">
+                                        <p class="text-3xl font-mono font-medium text-muji-ink">TPE</p>
+                                        <p class="text-[10px] text-stone-400 tracking-widest mt-1">台北桃園</p>
+                                    </div>
+                                    <div class="flex flex-col items-center px-4">
+                                        <span class="text-[9px] font-mono border border-stone-300 px-2 py-0.5 rounded text-stone-500 mb-2">TR 866</span>
+                                        <i class="ph-light ph-airplane-right text-stone-300 text-xl"></i>
+                                        <span class="text-[9px] text-stone-400 mt-1">酷航 Scoot</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-3xl font-mono font-medium text-muji-ink">NRT</p>
+                                        <p class="text-[10px] text-stone-400 tracking-widest mt-1">東京成田</p>
+                                    </div>
+                                </div>
+                                <div class="p-5 flex justify-between">
+                                    <div>
+                                        <p class="text-stone-400 text-[9px] tracking-widest mb-1">日期</p>
+                                        <p class="font-mono font-medium text-sm text-muji-ink">2026/05/10</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-400 text-[9px] tracking-widest mb-1">航廈</p>
+                                        <p class="font-mono font-medium text-sm text-muji-ink">T1</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-400 text-[9px] tracking-widest mb-1">起飛時間</p>
+                                        <p class="font-mono font-medium text-sm text-muji-ink">06:45</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 完整修復：回程卡片 -->
+                            <div class="bg-white rounded-2xl shadow-soft border border-stone-200 overflow-hidden mt-4">
+                                <div class="bg-stone-50/50 p-5 flex justify-between items-center border-b border-stone-200 border-dashed relative">
+                                    <div class="absolute -left-3 -bottom-3 w-6 h-6 bg-muji-bg rounded-full border-t border-r border-stone-200"></div>
+                                    <div class="absolute -right-3 -bottom-3 w-6 h-6 bg-muji-bg rounded-full border-t border-l border-stone-200"></div>
+                                    
+                                    <div class="text-center">
+                                        <p class="text-3xl font-mono font-medium text-muji-ink">NRT</p>
+                                        <p class="text-[10px] text-stone-400 tracking-widest mt-1">東京成田</p>
+                                    </div>
+                                    <div class="flex flex-col items-center px-4">
+                                        <span class="text-[9px] font-mono border border-stone-300 px-2 py-0.5 rounded text-stone-500 mb-2">MM 627</span>
+                                        <i class="ph-light ph-airplane-right text-stone-300 text-xl"></i>
+                                        <span class="text-[9px] text-stone-400 mt-1">樂桃 Peach</span>
+                                    </div>
+                                    <div class="text-center">
+                                        <p class="text-3xl font-mono font-medium text-muji-ink">TPE</p>
+                                        <p class="text-[10px] text-stone-400 tracking-widest mt-1">台北桃園</p>
+                                    </div>
+                                </div>
+                                <div class="p-5 flex justify-between">
+                                    <div>
+                                        <p class="text-stone-400 text-[9px] tracking-widest mb-1">日期</p>
+                                        <p class="font-mono font-medium text-sm text-muji-ink">2026/05/16</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-400 text-[9px] tracking-widest mb-1">航廈</p>
+                                        <p class="font-mono font-medium text-sm text-muji-ink">T1</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-stone-400 text-[9px] tracking-widest mb-1">起飛時間</p>
+                                        <p class="font-mono font-medium text-sm text-muji-ink">22:10</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 mt-8">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-xs font-bold tracking-widest text-muji-sub flex items-center gap-2">
+                                    <i class="ph-bold ph-identification-card"></i> {{ dict[infoLang].title }}
+                                </h2>
+                                <div class="flex gap-1 bg-stone-200/50 p-1 rounded-lg border border-stone-200">
+                                    <button @click="switchLang('zh')" :class="infoLang==='zh'?'bg-white shadow-sm text-muji-ink':'text-stone-400'" class="px-3 py-1 text-[10px] rounded-md font-medium tracking-widest transition-all">中</button>
+                                    <button @click="switchLang('en')" :class="infoLang==='en'?'bg-white shadow-sm text-muji-ink':'text-stone-400'" class="px-3 py-1 text-[10px] rounded-md font-medium tracking-widest transition-all">EN</button>
+                                    <button @click="switchLang('ja')" :class="infoLang==='ja'?'bg-white shadow-sm text-muji-ink':'text-stone-400'" class="px-3 py-1 text-[10px] rounded-md font-medium tracking-widest transition-all">日</button>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div v-for="member in familyMembers" :key="member.id" class="bg-muji-card rounded-2xl p-5 shadow-soft border border-stone-200">
+                                    <div class="flex items-center mb-5 border-b border-stone-100 pb-3">
+                                        <span class="text-sm font-bold tracking-wide text-muji-ink">{{ member.nameZh }}</span>
+                                    </div>
+                                    <div class="flex flex-col gap-4">
+                                        <div class="flex flex-col gap-3 border-b border-stone-50 pb-2">
+                                            <div class="flex flex-col justify-end">
+                                                <p class="text-[10px] tracking-widest text-stone-400 mb-1 uppercase">{{ dict[infoLang].surname }}</p>
+                                                <div class="flex justify-between items-end gap-2">
+                                                    <p class="text-base font-mono text-muji-ink tracking-wide">{{ member.surname || dict[infoLang].unknown }}</p>
+                                                    <button :disabled="!member.surname" @click="copyText(member.surname, member.id + '-surname')" class="text-[10px] text-muji-tech bg-stone-50 border border-stone-200 py-1.5 rounded transition-all text-center font-medium tracking-widest w-[68px] shrink-0 flex-none hover:bg-stone-100 active:scale-95">{{ copiedField === member.id + '-surname' ? dict[infoLang].copied : dict[infoLang].copy }}</button>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col justify-end">
+                                                <p class="text-[10px] tracking-widest text-stone-400 mb-1 uppercase">{{ dict[infoLang].givenName }}</p>
+                                                <div class="flex justify-between items-end gap-2">
+                                                    <p class="text-base font-mono text-muji-ink tracking-wide">{{ member.givenName || dict[infoLang].unknown }}</p>
+                                                    <button :disabled="!member.givenName" @click="copyText(member.givenName, member.id + '-givenName')" class="text-[10px] text-muji-tech bg-stone-50 border border-stone-200 py-1.5 rounded transition-all text-center font-medium tracking-widest w-[68px] shrink-0 flex-none hover:bg-stone-100 active:scale-95">{{ copiedField === member.id + '-givenName' ? dict[infoLang].copied : dict[infoLang].copy }}</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-end border-b border-stone-50 pb-2">
+                                            <div>
+                                                <p class="text-[10px] tracking-widest text-stone-400 mb-1 uppercase">{{ dict[infoLang].passportNo }}</p>
+                                                <p class="text-base font-mono text-muji-ink tracking-wide">{{ member.passportNo || dict[infoLang].unknown }}</p>
+                                            </div>
+                                            <button :disabled="!member.passportNo" @click="copyText(member.passportNo, member.id + '-passport')" class="text-[10px] text-muji-tech bg-stone-50 border border-stone-200 py-1.5 rounded transition-all text-center font-medium tracking-widest w-[68px] shrink-0 flex-none hover:bg-stone-100 active:scale-95">{{ copiedField === member.id + '-passport' ? dict[infoLang].copied : dict[infoLang].copy }}</button>
+                                        </div>
+                                        <div class="flex justify-between items-end border-b border-stone-50 pb-2">
+                                            <div>
+                                                <p class="text-[10px] tracking-widest text-stone-400 mb-1 uppercase">{{ dict[infoLang].idNo }}</p>
+                                                <p class="text-base font-mono text-muji-ink tracking-wide">{{ member.idNo || dict[infoLang].unknown }}</p>
+                                            </div>
+                                            <button :disabled="!member.idNo" @click="copyText(member.idNo, member.id + '-id')" class="text-[10px] text-muji-tech bg-stone-50 border border-stone-200 py-1.5 rounded transition-all text-center font-medium tracking-widest w-[68px] shrink-0 flex-none hover:bg-stone-100 active:scale-95">{{ copiedField === member.id + '-id' ? dict[infoLang].copied : dict[infoLang].copy }}</button>
+                                        </div>
+                                        <div class="flex gap-8 pt-1">
+                                            <div>
+                                                <p class="text-[10px] tracking-widest text-stone-400 mb-1 uppercase">{{ dict[infoLang].gender }}</p>
+                                                <p class="text-sm text-muji-ink font-medium">{{ member.gender ? dict[infoLang][member.gender] : dict[infoLang].unknown }}</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-[10px] tracking-widest text-stone-400 mb-1 uppercase">{{ dict[infoLang].bloodType }}</p>
+                                                <p class="text-sm font-mono text-muji-ink">{{ member.bloodType ? member.bloodType + (infoLang === 'en' ? '' : ' 型') : dict[infoLang].unknown }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </transition>
         </main>
 
-        <!-- Bottom Navigation (加入 id 以供聚光燈定位) -->
-        <nav class="glass-panel fixed bottom-0 w-full max-w-md z-50" style="padding-bottom: max(16px, env(safe-area-inset-bottom));">
+        <!-- Bottom Navigation -->
+        <nav id="nav-bar" class="glass-panel fixed bottom-0 w-full max-w-md z-50" style="padding-bottom: max(16px, env(safe-area-inset-bottom));">
             <div class="flex justify-around items-center h-[65px] px-2 relative outline-none pt-1">
                 <button v-for="tab in tabs" :key="tab.id" :id="'nav-' + tab.id" @click="switchTab(tab.id)" 
                     class="flex-1 flex flex-col items-center justify-center h-full space-y-1 transition-colors group relative outline-none">
@@ -567,7 +706,6 @@
     <script>
         const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
-        // --- Web Audio API 合成器 (獨立於 Vue) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
         let isAudioUnlocked = false;
@@ -576,13 +714,11 @@
             if (isAudioUnlocked) return;
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
-
             const buffer = audioCtx.createBuffer(1, 1, 22050);
             const source = audioCtx.createBufferSource();
             source.buffer = buffer;
             source.connect(audioCtx.destination);
             if (source.start) source.start(0);
-
             isAudioUnlocked = true;
             document.removeEventListener('touchstart', unlockAudio, true);
             document.removeEventListener('touchend', unlockAudio, true);
@@ -646,7 +782,6 @@
 
         createApp({
             setup() {
-                // --- 1. 數據聲明 (Refs) ---
                 const showSplash = ref(true); 
                 const splashStep = ref(0);    
                 const mainScrollArea = ref(null); 
@@ -657,29 +792,33 @@
                 const fullscreenPhrase = ref(null);
                 const fontSizeLevel = ref(1);
                 
-                // 新增：16 步智慧跨分頁追蹤導覽陣列 (保姆級圖卡，完全去特定化詞彙)
+                // 💡 20 步完美氣泡與聚光燈教學 (絕對無遮擋、附帶箭頭)
                 const showTutorialOverlay = ref(false);
                 const tutorialStep = ref(0);
                 const spotlightStyle = ref({});
                 const tooltipStyle = ref({});
+                const arrowStyle = ref({});
                 const tutorialSteps = [
-                    { target: 'header-logo', tab: 'home', icon: 'ph-hand-waving text-muji-accent', title: '歡迎使用伴旅', desc: '這是一款專為您打造的數位旅遊管家，讓我們花一分鐘快速了解如何操作吧！' },
-                    { target: 'btn-font', tab: 'home', icon: 'ph-text-aa text-muji-sub', title: '放大字體', desc: '閱讀不費力！隨時點擊右上角的「A」，整個畫面的文字都會瞬間放大喔。' },
-                    { target: 'weather-card', tab: 'home', icon: 'ph-cloud-sun text-stone-500', title: '專屬天氣管家', desc: '系統會自動定位您的位置，提供當日即時天氣與最貼心的穿搭建議。' },
-                    { target: 'btn-refresh-location', tab: 'home', icon: 'ph-crosshair-simple text-muji-ink', title: '重新定位', desc: '若移動到不同的城市，可以點擊這顆「十字瞄準」按鈕，立即更新當地天氣。' },
-                    { target: 'home-quick-actions', tab: 'home', icon: 'ph-map-pin text-green-600', title: '快捷導航與翻譯', desc: '迷路時點選「帶我回飯店」；遇到看不懂的外文菜單，點擊「相機翻譯」幫您解圍。' },
-                    { target: 'home-calculator', tab: 'home', icon: 'ph-calculator text-muji-tech', title: '匯率計算機', desc: '購物好幫手！輸入當地幣值會自動換算台幣，點擊箭頭還能切換幣別與更新匯率。' },
-                    { target: 'nav-itinerary', tab: 'home', icon: 'ph-hand-pointing text-muji-ink', title: '準備切換頁面', desc: '首頁介紹完畢。接下來，請跟著點擊底部的「行程」圖示，我們去看看行程規劃！' },
-                    { target: 'itinerary-dates', tab: 'itinerary', icon: 'ph-calendar-blank text-muji-ink', title: '切換日期', desc: '這裡會顯示所有安排。左右滑動並點擊上方日期，就能查看每一天的專屬行程表。' },
-                    { target: 'itinerary-spot-0', tab: 'itinerary', icon: 'ph-navigation-arrow text-muji-tech', title: '一鍵景點導航', desc: '想知道怎麼去景點？點擊行程卡片上的「小箭頭」，就會自動打開地圖帶您過去！' },
-                    { target: 'nav-tools', tab: 'itinerary', icon: 'ph-hand-pointing text-muji-ink', title: '切換至工具箱', desc: '旅途中遇到困難怎麼辦？點擊底部的「工具」圖示，裡面有許多必備神器。' },
-                    { target: 'tools-guide', tab: 'tools', icon: 'ph-airplane-takeoff text-stone-600', title: '通關懶人包', desc: '第一次出國也不怕！這裡有搭飛機、過海關的圖文步驟，跟著指示走最安心。' },
-                    { target: 'tools-translate', tab: 'tools', icon: 'ph-translate text-muji-tech', title: '隨身翻譯字卡', desc: '點擊大聲公會自動播放外語語音，點放大鏡能全螢幕顯示文字給店員看，溝通零障礙。' },
-                    { target: 'nav-checklist', tab: 'tools', icon: 'ph-hand-pointing text-muji-ink', title: '切換至清單', desc: '出發前，請點擊底部的「清單」圖示，讓我們檢查行李是否都帶齊了。' },
-                    { target: 'checklist-area', tab: 'checklist', icon: 'ph-list-checks text-muji-ink', title: '行前準備清單', desc: '點擊項目即可打勾。右下角會隨時顯示您的準備進度，確認達到 100% 就能安心出發！' },
-                    { target: 'nav-vault', tab: 'checklist', icon: 'ph-hand-pointing text-muji-ink', title: '切換至保險箱', desc: '最後，點擊底部的「保險箱」圖示，這裡存放了非常重要的私密資訊。' },
-                    { target: 'vault-area', tab: 'vault', icon: 'ph-lock-key text-stone-500', title: '隱私保險箱', desc: '為了保護隱私，這裡存放的護照與航班等重要資訊，必須輸入專屬密碼才能解鎖觀看。' },
-                    { target: 'header-logo', tab: 'home', icon: 'ph-confetti text-muji-accent', title: '🎉 恭喜完成教學！', desc: '您已順利掌握所有功能！若想複習，隨時可點擊右上角「？」。祝大家旅程平安順心、充滿美好回憶！' }
+                    { target: 'header-logo', tab: 'home', icon: 'ph-hand-waving text-muji-accent', title: '歡迎使用伴旅', desc: '這是一款為大家打造的數位旅遊管家，讓我們花一分鐘快速了解如何操作吧。' },
+                    { target: 'btn-font', tab: 'home', icon: 'ph-text-aa text-muji-sub', title: '放大字體', desc: '覺得文字太小嗎？隨時點擊這裡，整個畫面的文字都會放大，讓閱讀更舒適。' },
+                    { target: 'btn-sos', tab: 'home', icon: 'ph-warning-circle text-muji-accent', title: '緊急求助包', desc: '遇到突發狀況請按這裡！裡面準備了報警求救電話以及實用的日文求救字卡。' },
+                    { target: 'weather-card', tab: 'home', icon: 'ph-cloud-sun text-stone-500', title: '專屬天氣管家', desc: '這裡會顯示您的目前位置與天氣，並提供貼心的在地穿搭建議。' },
+                    { target: 'btn-refresh-location', tab: 'home', icon: 'ph-crosshair-simple text-muji-ink', title: '重新定位', desc: '若想更新所在位置與天氣，請點擊這顆十字按鈕，系統會重新為您定位。' },
+                    { target: 'home-quick-actions', tab: 'home', icon: 'ph-map-pin text-green-600', title: '快捷導航與翻譯', desc: '迷路時可點選「帶我回飯店」；遇到外文菜單，點擊「相機翻譯」即可輕鬆辨識。' },
+                    { target: 'home-calculator', tab: 'home', icon: 'ph-calculator text-muji-tech', title: '匯率計算機', desc: '購物時必備的計算機。輸入當地幣值，系統會自動為您換算成台幣。' },
+                    { target: 'btn-refresh-rate', tab: 'home', icon: 'ph-arrows-clockwise text-stone-500', title: '更新匯率', desc: '匯率會變動，點擊這顆旋轉箭頭，系統會連上網路抓取最新的日幣匯率。' },
+                    { target: 'btn-toggle-currency', tab: 'home', icon: 'ph-arrows-down-up text-muji-accent', title: '切換幣值', desc: '若想反向計算（台幣換日幣），點擊上下箭頭即可快速切換輸入的幣別。' },
+                    { target: 'nav-itinerary', tab: 'home', icon: 'ph-hand-pointing text-muji-ink', title: '切換至行程', desc: '首頁介紹完畢。接著，請點擊底部的「行程」圖示，我們去看看行程規劃！' },
+                    { target: 'itinerary-dates', tab: 'itinerary', icon: 'ph-calendar-blank text-muji-ink', title: '切換日期', desc: '這裡會顯示所有的行程安排。左右滑動並點擊日期，就能查看每一天的專屬行程表。' },
+                    { target: 'itinerary-spot-0', tab: 'itinerary', icon: 'ph-navigation-arrow text-muji-tech', title: '一鍵景點導航', desc: '點擊行程卡片上的「箭頭圖示」，就會自動開啟地圖，為您導航到該景點！' },
+                    { target: 'nav-tools', tab: 'itinerary', icon: 'ph-hand-pointing text-muji-ink', title: '切換至工具', desc: '旅途中需要輔助嗎？請點擊底部的「工具」圖示，前往實用工具箱。' },
+                    { target: 'tools-guide', tab: 'tools', icon: 'ph-airplane-takeoff text-stone-600', title: '通關懶人包', desc: '這裡備有「通關懶人包」，詳細圖文步驟帶您輕鬆完成機場報到與出入境手續。' },
+                    { target: 'tools-translate', tab: 'tools', icon: 'ph-translate text-muji-tech', title: '隨身翻譯字卡', desc: '點大聲公可自動播放語音，點放大鏡能全螢幕顯示文字給店員看，溝通無障礙。' },
+                    { target: 'nav-checklist', tab: 'tools', icon: 'ph-hand-pointing text-muji-ink', title: '切換至清單', desc: '出發前記得確認行李！請點擊底部的「清單」圖示，前往行前準備清單。' },
+                    { target: 'checklist-area', tab: 'checklist', icon: 'ph-list-checks text-muji-ink', title: '行前準備清單', desc: '點擊項目即可打勾。右下角會顯示準備進度，確認達到 100% 就能安心出發！' },
+                    { target: 'nav-vault', tab: 'checklist', icon: 'ph-hand-pointing text-muji-ink', title: '切換至保險箱', desc: '最後，請點擊底部的「保險箱」圖示，這裡存放了非常重要的隱私資訊。' },
+                    { target: 'vault-area', tab: 'vault', icon: 'ph-lock-key text-stone-500', title: '隱私保險箱', desc: '護照與航班等重要資訊皆受保護，必須輸入專屬密碼才能解鎖，確保資訊安全。' },
+                    { target: 'header-logo', tab: 'home', icon: 'ph-confetti text-muji-accent', title: '🎉 恭喜完成教學', desc: '您已順利掌握所有功能！隨時可點擊右上角「？」複習。祝大家旅程平安順心、充滿美好回憶！' }
                 ];
 
                 const infoLang = ref('zh');
@@ -704,20 +843,31 @@
                 const isJpyToTwd = ref(true);
                 const calcExpression = ref('');
 
-                // --- 2. 核心數據定義 ---
+                // --- 2. 核心真實資料 ---
                 const familyMembers = ref([
-                    { id: '1', nameZh: '旅客 A', surname: 'TRAVELER', givenName: 'A', passportNo: '369777376', idNo: 'A120604863', gender: 'male', bloodType: 'B' },
-                    { id: '2', nameZh: '旅客 B', surname: 'TRAVELER', givenName: 'B', passportNo: '369777375', idNo: 'Y220248900', gender: 'female', bloodType: 'O' }
-                ]); // 這裡簡化了假資料以維持版面整潔，等您提供真實資料
+                    { id: '1', nameZh: '劉育志', surname: 'LIU', givenName: 'YU-CHIH', passportNo: '369777376', idNo: 'A120604863', gender: 'male', bloodType: 'B' },
+                    { id: '2', nameZh: '何怡然', surname: 'HO', givenName: 'YEE-JAN', passportNo: '369777375', idNo: 'Y220248900', gender: 'female', bloodType: 'O' },
+                    { id: '3', nameZh: '劉丞剛', surname: 'LIU', givenName: 'CHENG-KANG', passportNo: '360301535', idNo: 'A129645995', gender: 'male', bloodType: 'B' },
+                    { id: '4', nameZh: '劉捷如', surname: 'LIU', givenName: 'JYE-RU', passportNo: '368890805', idNo: 'A230198721', gender: 'female', bloodType: 'B' }
+                ]);
 
                 const itinerary = ref([
                     { id: 'day1', title: '5/10 (日)', spots: [
                         { id: '1-1', time: '04:30', name: '抵達桃園機場', desc: '辦理報到手續與託運行李。', location: '桃園國際機場第一航廈', type: 'transit' },
-                        { id: '1-2', time: '06:45', name: '出發前往東京', desc: '搭乘班機出發，準備開始這趟旅程！', location: '桃園國際機場', type: 'transit' },
-                        { id: '1-3', time: '11:15', name: '抵達當地機場', desc: '辦理入關手續，領取行李。', location: '成田國際機場', type: 'transit' },
-                        { id: '1-4', time: '15:00', name: '飯店 Check-in', desc: '抵達我們這幾天的家，先放行李休息一下。', location: '東京都台東区北上野2丁目２５ー７', tags: ['住宿', '需出示護照'], type: 'hotel' }
+                        { id: '1-2', time: '06:45', name: '出發前往東京', desc: '搭乘酷航 TR 866，準備開始這趟旅程！', location: '桃園國際機場', type: 'transit' },
+                        { id: '1-3', time: '11:15', name: '抵達東京成田', desc: '辦理入關手續，領取行李，準備搭乘 Skyliner 前往上野。', location: '成田國際機場', type: 'transit' },
+                        { id: '1-4', time: '15:00', name: '上野小筑 Check-in', desc: '抵達我們這幾天的家，先放行李休息一下。', location: '東京都台東区北上野2丁目２５ー７', tags: ['住宿', '需出示護照'], type: 'hotel' }
                     ]},
-                    { id: 'day2', title: '5/11 (一)', spots: [{ id: '2-1', time: '09:00', name: '行程待定', desc: '等待規劃中。', location: '東京', type: 'sight' }] }
+                    { id: 'day2', title: '5/11 (一)', spots: [{ id: '2-1', time: '09:00', name: '行程待定', desc: '點擊修改按鈕以新增行程內容。', location: '東京', type: 'sight' }] },
+                    { id: 'day3', title: '5/12 (二)', spots: [{ id: '3-1', time: '09:00', name: '行程待定', desc: '點擊修改按鈕以新增行程內容。', location: '東京', type: 'sight' }] },
+                    { id: 'day4', title: '5/13 (三)', spots: [{ id: '4-1', time: '09:00', name: '行程待定', desc: '點擊修改按鈕以新增行程內容。', location: '東京', type: 'sight' }] },
+                    { id: 'day5', title: '5/14 (四)', spots: [{ id: '5-1', time: '10:00', name: '美食之旅', desc: '探索當地特色料理。', location: '東京', type: 'food' }] },
+                    { id: 'day6', title: '5/15 (五)', spots: [{ id: '6-1', time: '09:00', name: '行程待定', desc: '點擊修改按鈕以新增行程內容。', location: '東京', type: 'sight' }] },
+                    { id: 'day7', title: '5/16 (六)', spots: [
+                        { id: '7-1', time: '18:00', name: '準備回程', desc: '確認行李打包完成，出發前往成田機場第 1 航廈。', location: '上野小筑', type: 'transit' },
+                        { id: '7-2', time: '22:10', name: '搭機返台', desc: '搭乘樂桃 MM 627 滿載而歸。', location: '成田國際機場第1航廈', type: 'transit' },
+                        { id: '7-3', time: '01:00', name: '抵達台灣', desc: '平安抵達桃園機場，搭車回家。', location: '桃園國際機場', type: 'transit' }
+                    ]}
                 ]);
 
                 const phrases = ref([
@@ -736,15 +886,41 @@
                 const checklistCategories = ref(JSON.parse(JSON.stringify([
                     { id: 'docs', title: '文件與申請', icon: 'ph-file-text', items: [
                         { id: 'c-1', text: '護照正本 (效期>6個月)', checked: false, note: '備妥影本並拍照存檔備用。' },
-                        { id: 'c-2', text: '填寫入境表單 (VJW)', checked: false, note: '出發前填妥並截圖 QR Code 以加速通關。', action: { text: '前往填寫', url: 'https://www.vjw.digital.go.jp/main/#/vjwplo001' } },
-                        { id: 'c-3', text: '電子機票與訂房確認信', checked: false, note: '建議列印紙本備用。' }
+                        { id: 'c-2', text: '填寫 Visit Japan Web (VJW)', checked: false, note: '出發前填妥並截圖 QR Code 以加速通關。', action: { text: '前往填寫', url: 'https://www.vjw.digital.go.jp/main/#/vjwplo001' }, tutorial: { text: '圖文教學', url: 'https://www.vjw.digital.go.jp/manual/main/visitjapanweb_manual_zh-cmn-Hant.html' } },
+                        { id: 'c-3', text: '電子機票與訂房確認信', checked: false, note: '建議列印紙本備用，VJW 填寫時也會用到。' },
+                        { id: 'c-5', text: '旅遊平安/不便險', checked: false, note: '確認含醫療與不便險，備妥英文證明。' }
                     ]},
                     { id: 'finance', title: '網路與財務', icon: 'ph-wallet', items: [
-                        { id: 'c-6', text: '出國上網卡 (eSIM/SIM)', checked: false, note: 'eSIM 建議在出發前先設定綁定。' },
-                        { id: 'c-7', text: '當地現鈔與零錢包', checked: false, note: '部分傳統店家及神社仍需使用現金。' }
+                        { id: 'c-6', text: '出國上網卡 (eSIM/SIM)', checked: false, note: 'eSIM 建議在台先設定綁定。' },
+                        { id: 'c-7', text: '當地現鈔與零錢包', checked: false, note: '部分傳統店家及神社仍需現金。' },
+                        { id: 'c-8', text: '交通卡 (西瓜卡/PASMO)', checked: false, note: 'iPhone可綁數位卡，若需實體卡建議先在台灣備妥。', tutorial: { text: 'Apple 官方教學', url: 'https://support.apple.com/zh-tw/HT207155' } },
+                        { id: 'c-9', text: '信用卡', checked: false, note: '建議攜帶 JCB 等高回饋卡並綁定行動支付。' }
+                    ]},
+                    { id: 'electronics', title: '電子配件', icon: 'ph-plug', items: [
+                        { id: 'c-10', text: '手提行李秤', checked: false, note: '搭乘廉航必備，避免行李超重。' },
+                        { id: 'c-11', text: '行動電源與備用鋰電池', checked: false, note: '【必放隨身】絕對不可託運！' },
+                        { id: 'c-12', text: '充電器與各式線材', checked: false, note: '確認各類裝置線材是否帶齊。' },
+                        { id: 'c-13', text: '3孔轉2孔轉接頭', checked: false, note: '日本為雙平腳插座，三孔插頭需轉接頭。' }
+                    ]},
+                    { id: 'toiletries', title: '盥洗與藥物', icon: 'ph-first-aid', items: [
+                        { id: 'c-14', text: '牙刷與牙膏', checked: false, note: '響應環保，部分飯店已不主動提供一次性備品。' },
+                        { id: 'c-15', text: '個人保養品與化妝品', checked: false, note: '【隨身】單瓶須<100ml並裝入1L透明夾鏈袋。【託運】單瓶<500ml。' },
+                        { id: 'c-16', text: '個人常備藥物', checked: false, note: '感冒藥、腸胃藥、止痛藥、休足時間、防磨貼及個人慢性病藥。' }
+                    ]},
+                    { id: 'clothing', title: '服飾穿搭', icon: 'ph-t-shirt', items: [
+                        { id: 'c-18a', text: '短袖 / 薄長袖上衣', checked: false, note: '白天氣溫舒適，以透氣舒適的棉質為主。' },
+                        { id: 'c-18b', text: '防風薄外套 / 針織衫', checked: false, note: '早晚溫差大，或室內冷氣較強時備用。' },
+                        { id: 'c-19', text: '好走的鞋', checked: false, note: '每天步數可能破萬，務必穿著習慣且柔軟的舒適鞋款。' },
+                        { id: 'c-20', text: '晴雨兩用摺疊傘 / 遮陽帽', checked: false, note: '紫外線偏強且偶有陣雨，建議隨身攜帶。' },
+                        { id: 'c-22', text: '環保購物袋', checked: false, note: '當地店家塑膠袋需付費，隨身帶一個很方便。' }
+                    ]},
+                    { id: 'rules', title: '海關與飛安禁令 (必看)', icon: 'ph-warning-octagon', items: [
+                        { id: 'c-r1', text: '禁止攜帶肉類製品', checked: false, note: '嚴防豬瘟，肉乾、香腸、肉鬆蛋捲等絕對不可攜帶。' },
+                        { id: 'c-r2', text: '隨身液體限制', checked: false, note: '登機隨身行李內，所有液體/膏狀物單瓶不得超過100ml，且須統一放入1公升透明夾鏈袋中。' },
+                        { id: 'c-r4', text: '剪刀與刀具限制', checked: false, note: '【必須託運】無論大小，指甲剪、修眉刀、剪刀等利器不可隨身登機。' }
                     ]}
-                ]))); // 這裡縮減了假資料以維持版面整潔，等您提供真實資料
-                
+                ])));
+
                 const activeDay = ref('day1');
 
                 // --- 3. 計算屬性 (Computed) ---
@@ -815,10 +991,7 @@
                     return evaluatedJpy.value.toLocaleString('zh-TW', { maximumFractionDigits: isJpyToTwd.value ? 0 : 1 });
                 });
 
-                // --- 4. 音效與切換邏輯 ---
-                const playSound = (type) => {
-                    if(sfx[type]) sfx[type]();
-                };
+                const playSound = (type) => { if(sfx[type]) sfx[type](); };
 
                 const switchTab = (id) => {
                     if (activeTab.value !== id) {
@@ -844,24 +1017,27 @@
                 const openGuide = () => { showGuide.value = true; playSound('pop'); };
                 const closeGuide = () => { showGuide.value = false; playSound('pop'); };
 
-                // --- 5. ✨ 極致滑順追蹤與絕對防遮擋引擎 ---
-                const updateSpotlight = () => {
+                // --- 5. ✨ 極致智慧氣泡教學引擎 (Smart Tooltip Engine) ---
+                const updateSpotlight = async () => {
                     if (!showTutorialOverlay.value) return;
                     const step = tutorialSteps[tutorialStep.value];
-                    const el = document.getElementById(step.target);
                     
+                    await nextTick(); 
+                    
+                    const el = document.getElementById(step.target);
                     if (el) {
-                        // 如果目標不是底部固定導覽列，就讓畫面平滑捲動過去
+                        // 平滑滾動使其居中 (避開頭尾導覽列)
                         if (!step.target.startsWith('nav-')) {
                             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                         
-                        // 延長等待時間，確保所有平滑滾動 100% 結束，再去抓座標，才不會抖動
                         setTimeout(() => {
-                            const rect = el.getBoundingClientRect();
-                            const padding = step.target.startsWith('nav-') ? 4 : 12; // 底部導覽列光圈小一點
+                            const elAfterScroll = document.getElementById(step.target);
+                            if (!elAfterScroll) return;
+                            const rect = elAfterScroll.getBoundingClientRect();
+                            const padding = step.target.startsWith('nav-') ? 4 : 8; 
                             
-                            // 更新光圈位置 (完全貼合元素)
+                            // 更新聚光燈挖洞
                             spotlightStyle.value = {
                                 left: `${rect.left - padding}px`,
                                 top: `${rect.top - padding}px`,
@@ -869,23 +1045,55 @@
                                 height: `${rect.height + padding * 2}px`
                             };
 
-                            // 絕對安全區判斷：保證圖卡永遠不會跑出螢幕，也不會擋到光圈
+                            // 動態計算氣泡與箭頭座標
                             const isBottomHalf = (rect.top + rect.height / 2) > (window.innerHeight / 2);
+                            const ttWidth = 320; // 氣泡寬度
+                            const targetCenterX = rect.left + rect.width / 2; // 目標中心點
+                            
+                            // 限制氣泡不能超出螢幕左右邊界
+                            const minCenterX = ttWidth / 2 + 16;
+                            const maxCenterX = window.innerWidth - ttWidth / 2 - 16;
+                            const tooltipCenterX = Math.max(minCenterX, Math.min(targetCenterX, maxCenterX));
+                            
+                            // 計算箭頭相對於氣泡的位移
+                            const arrowOffset = targetCenterX - tooltipCenterX;
 
                             if (isBottomHalf) {
-                                // 光圈在下方 ➡️ 卡片固定鎖死在畫面最頂部安全區
+                                // 光圈在下方 ➡️ 氣泡在上方、箭頭朝下
                                 tooltipStyle.value = { 
-                                    top: 'max(40px, env(safe-area-inset-top))', 
-                                    bottom: 'auto' 
+                                    bottom: `${window.innerHeight - rect.top + padding + 12}px`, 
+                                    top: 'auto',
+                                    left: `${tooltipCenterX}px`,
+                                    transform: 'translateX(-50%)',
+                                    width: `${ttWidth}px`
+                                };
+                                arrowStyle.value = {
+                                    bottom: '-8px',
+                                    left: `calc(50% + ${arrowOffset}px)`,
+                                    transform: 'translateX(-50%)',
+                                    borderTop: '8px solid white',
+                                    borderLeft: '8px solid transparent',
+                                    borderRight: '8px solid transparent'
                                 };
                             } else {
-                                // 光圈在上方 ➡️ 卡片固定鎖死在畫面最底部安全區 (同時避開底端 NavBar)
+                                // 光圈在上方 ➡️ 氣泡在下方、箭頭朝上
                                 tooltipStyle.value = { 
-                                    bottom: 'max(100px, env(safe-area-inset-bottom))', 
-                                    top: 'auto' 
+                                    top: `${rect.bottom + padding + 12}px`, 
+                                    bottom: 'auto',
+                                    left: `${tooltipCenterX}px`,
+                                    transform: 'translateX(-50%)',
+                                    width: `${ttWidth}px`
+                                };
+                                arrowStyle.value = {
+                                    top: '-8px',
+                                    left: `calc(50% + ${arrowOffset}px)`,
+                                    transform: 'translateX(-50%)',
+                                    borderBottom: '8px solid white',
+                                    borderLeft: '8px solid transparent',
+                                    borderRight: '8px solid transparent'
                                 };
                             }
-                        }, 350); 
+                        }, 350); // 確保畫面停止滾動
                     }
                 };
 
@@ -894,13 +1102,13 @@
                     tutorialStep.value = 0;
                     showTutorialOverlay.value = true;
                     
-                    // 強制切回首頁開始教學
                     if (activeTab.value !== tutorialSteps[0].tab) {
                         activeTab.value = tutorialSteps[0].tab;
                     }
                     
                     setTimeout(() => {
                         window.scrollTo(0, 0);
+                        if (mainScrollArea.value) mainScrollArea.value.scrollTop = 0;
                         updateSpotlight();
                     }, 100); 
                 };
@@ -908,48 +1116,39 @@
                 const closeTutorial = () => {
                     playSound('pop');
                     showTutorialOverlay.value = false;
-                    localStorage.setItem('tokyo_voyager_tutorial_16steps', 'true'); // 記錄已觀看
-                    
-                    // 若不在首頁則平滑切回首頁
-                    if (activeTab.value !== 'home') {
-                        switchTab('home');
-                    }
+                    localStorage.setItem('tokyo_voyager_tutorial_v5', 'true'); 
+                    if (activeTab.value !== 'home') switchTab('home');
                 };
 
-                const nextTutorialStep = () => {
+                const nextTutorialStep = async () => {
                     if (tutorialStep.value < tutorialSteps.length - 1) {
                         playSound('pop');
                         const nextStepObj = tutorialSteps[tutorialStep.value + 1];
                         
-                        // ✨ 魔法跨分頁追蹤：如果下一步在不同分頁，系統自動幫使用者切換！
+                        // 自動跨分頁
                         if (activeTab.value !== nextStepObj.tab) {
-                            activeTab.value = nextStepObj.tab; // 自動切換分頁
-                            
+                            activeTab.value = nextStepObj.tab; 
+                            await nextTick();
                             setTimeout(() => {
-                                // 瞬間把新分頁的滾動條歸零
                                 window.scrollTo(0, 0);
                                 if (mainScrollArea.value) mainScrollArea.value.scrollTop = 0;
-                                
                                 tutorialStep.value++;
                                 updateSpotlight();
-                            }, 250); // 預留新分頁淡出淡入渲染的時間
+                            }, 300); 
                         } else {
                             tutorialStep.value++;
                             updateSpotlight();
                         }
                     } else {
-                        playSound('success'); // 完成教學時播放成功音效
+                        playSound('success'); 
                         closeTutorial();
                     }
                 };
 
-                // --- 其他 API 與邏輯保留不變 ---
                 const scrollToTop = () => {
                     playSound('pop');
                     window.scrollTo({ top: 0, behavior: 'smooth' });
-                    if (mainScrollArea.value) {
-                        mainScrollArea.value.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
+                    if (mainScrollArea.value) mainScrollArea.value.scrollTo({ top: 0, behavior: 'smooth' });
                 };
 
                 const toggleCheck = (catId, itemId) => {
@@ -958,8 +1157,7 @@
                         const item = cat.items.find(i => i.id === itemId);
                         if (item) {
                             item.checked = !item.checked;
-                            if(item.checked) playSound('check');
-                            else playSound('uncheck');
+                            if(item.checked) playSound('check'); else playSound('uncheck');
                             localStorage.setItem('tokyo_voyager_checklist_v7', JSON.stringify(checklistCategories.value));
                             if (navigator.vibrate) navigator.vibrate(10);
                         }
@@ -1137,7 +1335,7 @@
                     if (navigator.vibrate) navigator.vibrate(20);
                 };
 
-                // --- 6. 生命周期 ---
+                // --- 7. 生命周期 ---
                 onMounted(() => {
                     if (window.AudioContext || window.webkitAudioContext) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     window.addEventListener('resize', updateSpotlight);
@@ -1149,7 +1347,7 @@
                         showSplash.value = false; 
                         
                         // 自動教學判定
-                        const hasSeenTutorial = localStorage.getItem('tokyo_voyager_tutorial_16steps');
+                        const hasSeenTutorial = localStorage.getItem('tokyo_voyager_tutorial_v5');
                         if (!hasSeenTutorial) setTimeout(() => { openTutorial(); }, 500);
                     }, 3200); 
 
@@ -1165,8 +1363,8 @@
                     playSound, switchTab, switchDay, switchLang, openSOS, closeSOS, openGuide, closeGuide,
                     showSplash, splashStep, mainScrollArea, scrollToTop,
                     
-                    // 聚光燈導覽
-                    showTutorialOverlay, tutorialStep, tutorialSteps, openTutorial, closeTutorial, nextTutorialStep, spotlightStyle, tooltipStyle,
+                    // 氣泡聚光燈導覽
+                    showTutorialOverlay, tutorialStep, tutorialSteps, openTutorial, closeTutorial, nextTutorialStep, spotlightStyle, tooltipStyle, arrowStyle,
                     
                     activeTab, tabs: [{ id: 'checklist', name: '清單', icon: 'ph-list-checks' }, { id: 'itinerary', name: '行程', icon: 'ph-map-trifold' }, { id: 'home', name: '首頁', icon: 'ph-house' }, { id: 'tools', name: '工具', icon: 'ph-squares-four' }, { id: 'vault', name: '保險箱', icon: 'ph-lock-key' }], 
                     pageTitle, tabSubtitle, currentDateShort, currentDayOfWeek, showSOS, showGuide,
