@@ -73,6 +73,9 @@
         
         /* 毛玻璃共用類別 */
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid rgba(255, 255, 255, 0.8); }
+        
+        /* Vault PIN 游標顏色 */
+        input[type="password"] { caret-color: #2C2C2C; }
     </style>
 </head>
 <body class="text-muji-ink font-sans antialiased selection:bg-stone-200">
@@ -169,9 +172,22 @@
                             <i :class="['ph-fill text-[160px]', weatherInfo.bgIcon]"></i>
                         </div>
                         <div class="flex justify-between items-start mb-4 relative z-10">
-                            <h2 class="text-xl font-medium tracking-wide">{{ greetingText }}，<span class="text-stone-300">{{ locationName }}</span></h2>
+                            <div class="flex flex-col">
+                                <h2 class="text-xl font-medium tracking-wide">{{ greetingText }}，<span class="text-stone-300">{{ locationName }}</span></h2>
+                                <div class="h-3 mt-1.5">
+                                    <p v-if="locationUpdateStatus" class="text-[10px] tracking-widest font-medium transition-all duration-300" :class="{
+                                        'text-stone-400 animate-pulse': locationUpdateStatus === 'fetching',
+                                        'text-green-400': locationUpdateStatus === 'success',
+                                        'text-red-400 opacity-90': locationUpdateStatus === 'error'
+                                    }">
+                                        <template v-if="locationUpdateStatus === 'fetching'">定位與氣象更新中...</template>
+                                        <template v-else-if="locationUpdateStatus === 'success'">已更新至最新位置</template>
+                                        <template v-else-if="locationUpdateStatus === 'error'">定位超時，顯示預設位置</template>
+                                    </p>
+                                </div>
+                            </div>
                             <!-- 修改按鈕點擊事件，傳遞 false 確保手動點擊時會發出音效 -->
-                            <button @click="updateLocation(false)" :disabled="isFetchingWeather" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all disabled:opacity-50 border border-stone-600 hover:bg-stone-700 text-stone-300 relative group">
+                            <button @click="updateLocation(false)" :disabled="isFetchingWeather" class="w-8 h-8 rounded-full flex items-center justify-center active:scale-95 transition-all disabled:opacity-50 border border-stone-600 hover:bg-stone-700 text-stone-300 relative group shrink-0">
                                 <i class="ph-bold ph-crosshair-simple text-sm" :class="{'animate-spin text-white': isFetchingWeather}"></i>
                             </button>
                         </div>
@@ -991,6 +1007,7 @@
 
                 const locationName = ref('東京');
                 const isFetchingWeather = ref(false);
+                const locationUpdateStatus = ref(null);
                 const weatherInfo = ref({ temp: null, desc: '載入中', icon: 'ph-cloud', bgIcon: 'ph-cloud', color: 'text-stone-300', type: 'cloudy' });
                 const exchangeRate = ref(0.2115);
                 const rateLastUpdated = ref('尚未更新');
@@ -1257,25 +1274,47 @@
                     // 自動定位不發出按鈕聲音，只有手動點擊才發聲
                     if (isAuto !== true) playSound('pop'); 
                     isFetchingWeather.value = true;
+                    locationUpdateStatus.value = 'fetching';
                     
                     if ("geolocation" in navigator) {
                         navigator.geolocation.getCurrentPosition(
-                            (p) => {
-                                // 成功取得定位：同時更新天氣與真實地名
-                                fetchWeatherData(p.coords.latitude, p.coords.longitude);
-                                fetchLocationName(p.coords.latitude, p.coords.longitude);
+                            async (p) => {
+                                try {
+                                    // 成功取得定位：同時更新天氣與真實地名
+                                    await Promise.all([
+                                        fetchWeatherData(p.coords.latitude, p.coords.longitude),
+                                        fetchLocationName(p.coords.latitude, p.coords.longitude)
+                                    ]);
+                                    locationUpdateStatus.value = 'success';
+                                    if (isAuto !== true) playSound('check'); // 手動定位成功音效
+                                } catch(e) {
+                                    locationUpdateStatus.value = 'error';
+                                    if (isAuto !== true) playSound('error'); // 手動定位失敗音效
+                                } finally {
+                                    isFetchingWeather.value = false;
+                                    setTimeout(() => { locationUpdateStatus.value = null; }, 2500);
+                                }
                             },
-                            (err) => {
-                                // 若使用者拒絕定位或失敗，則預設帶入東京
-                                console.warn("定位權限未開啟或失敗，使用預設值");
+                            async (err) => {
+                                // 若使用者拒絕定位或超時，則預設帶入東京
+                                console.warn("定位權限未開啟或超時，使用預設值");
                                 locationName.value = '東京';
-                                fetchWeatherData(35.6895, 139.6917);
+                                try { await fetchWeatherData(35.6895, 139.6917); } catch(e) {}
+                                locationUpdateStatus.value = 'error';
+                                if (isAuto !== true) playSound('error');
+                                isFetchingWeather.value = false;
+                                setTimeout(() => { locationUpdateStatus.value = null; }, 2500);
                             },
-                            { timeout: 10000, maximumAge: 60000 }
+                            { timeout: 10000, maximumAge: 60000 } // 時間上限調回 10 秒
                         );
                     } else { 
                         locationName.value = '東京';
-                        fetchWeatherData(35.6895, 139.6917); 
+                        fetchWeatherData(35.6895, 139.6917).finally(() => {
+                            locationUpdateStatus.value = 'error';
+                            isFetchingWeather.value = false;
+                            if (isAuto !== true) playSound('error');
+                            setTimeout(() => { locationUpdateStatus.value = null; }, 2500);
+                        });
                     }
                 };
 
@@ -1318,20 +1357,34 @@
                             weatherInfo.value.icon = iconMap[wType];
                             weatherInfo.value.bgIcon = iconMap[wType];
                         }
-                    } catch(e) {} finally { isFetchingWeather.value = false; }
+                    } catch(e) {
+                        throw e; // 將錯誤拋出讓外層處理狀態
+                    } 
+                    // 移除 finally 區塊，讓 isFetchingWeather 統一由 updateLocation 控制
                 };
 
                 const fetchExchangeRate = async () => {
                     try {
                         playSound('pop');
                         isFetchingRate.value = true;
+                        updateStatus.value = null; // 重置狀態
+                        
                         const res = await fetch('https://open.er-api.com/v6/latest/JPY');
                         const data = await res.json();
                         if (data && data.rates.TWD) {
                             exchangeRate.value = data.rates.TWD;
-                            rateLastUpdated.value = `${new Date().getHours()}:${new Date().getMinutes().toString().padStart(2,'0')} 更新`;
+                            rateLastUpdated.value = `${new Date().getHours().toString().padStart(2,'0')}:${new Date().getMinutes().toString().padStart(2,'0')} 更新`;
+                            
+                            // 給予「已更新」的視覺回饋
+                            updateStatus.value = 'success';
+                            setTimeout(() => { updateStatus.value = null; }, 2000);
                         }
-                    } catch (e) {} finally { isFetchingRate.value = false; }
+                    } catch (e) {
+                        updateStatus.value = 'error';
+                        setTimeout(() => { updateStatus.value = null; }, 2000);
+                    } finally { 
+                        isFetchingRate.value = false; 
+                    }
                 };
 
                 const toggleCurrency = () => { isJpyToTwd.value = !isJpyToTwd.value; playSound('pop'); };
@@ -1339,7 +1392,15 @@
                 const calcOp = (op) => {
                     if (op === 'C') calcExpression.value = '';
                     else if (op === 'back') calcExpression.value = calcExpression.value.slice(0, -1);
-                    else if (op === '=') { try { calcExpression.value = eval(calcExpression.value).toString(); } catch(e) { calcExpression.value = ''; } }
+                    else if (op === '=') { 
+                        try { 
+                            // 自動過濾結尾的運算符號再計算，避免 5+ 直接按 = 導致出錯清空
+                            const safeExpr = calcExpression.value.replace(/[+\-*/.]$/, '');
+                            if(safeExpr) {
+                                calcExpression.value = eval(safeExpr).toString(); 
+                            }
+                        } catch(e) { calcExpression.value = ''; } 
+                    }
                     else calcExpression.value += op;
                 };
 
@@ -1384,10 +1445,27 @@
                     playSound('pop');
                 }
 
-                const copyText = (text, fid) => {
+                // 全面升級：現代化的非同步剪貼簿 API，支援最新版 iOS 15+，並保留舊版備用方案
+                const copyText = async (text, fid) => {
                     playSound('pop');
-                    const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-                    copiedField.value = fid; setTimeout(() => copiedField.value = null, 2000);
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(text);
+                        } else {
+                            const el = document.createElement('textarea'); 
+                            el.value = text; 
+                            el.style.position = 'absolute';
+                            el.style.left = '-9999px';
+                            document.body.appendChild(el); 
+                            el.select(); 
+                            document.execCommand('copy'); 
+                            document.body.removeChild(el);
+                        }
+                        copiedField.value = fid; 
+                        setTimeout(() => copiedField.value = null, 2000);
+                    } catch (err) {
+                        console.error('複製失敗', err);
+                    }
                 };
 
                 const updateRootFontSize = () => {
@@ -1431,8 +1509,8 @@
                     showSplash, splashStep, mainScrollArea, scrollToTop,
                     activeTab, tabs: [{ id: 'checklist', name: '清單', icon: 'ph-list-checks' }, { id: 'itinerary', name: '行程', icon: 'ph-map-trifold' }, { id: 'home', name: '首頁', icon: 'ph-house' }, { id: 'tools', name: '工具', icon: 'ph-squares-four' }, { id: 'vault', name: '保險箱', icon: 'ph-lock-key' }], 
                     pageTitle, tabSubtitle, currentDateShort, currentDayOfWeek, showSOS, showGuide,
-                    locationName, isFetchingWeather, greetingText, dynamicAdvice, weatherInfo, updateLocation,
-                    exchangeRate, rateLastUpdated, isFetchingRate, updateStatus, isJpyToTwd, toggleCurrency, evaluatedBaseFormatted, calculatedResultFormatted, hasOperatorInExpr: computed(() => /[+\-*/]/.test(calcExpression.value)), displayExpression, handleCalc,
+                    locationName, isFetchingWeather, locationUpdateStatus, greetingText, dynamicAdvice, weatherInfo, updateLocation,
+                    exchangeRate, rateLastUpdated, isFetchingRate, updateStatus, fetchExchangeRate, isJpyToTwd, toggleCurrency, evaluatedBaseFormatted, calculatedResultFormatted, hasOperatorInExpr: computed(() => /[+\-*/]/.test(calcExpression.value)), displayExpression, handleCalc,
                     checklistCategories, checklistProgress, toggleCheck, addingItemForCategory, prepareAddItem, newItemText, addCustomItem, removeCustomItem,
                     itinerary, activeDay, currentDaySpots, currentDayItinerary,
                     familyMembers, isVaultUnlocked, pinInput, pinError, unlockVault, lockVault: handleLockVault,
