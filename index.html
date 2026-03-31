@@ -1190,8 +1190,9 @@
                         activeTab.value = id;
                         playSound('pop');
                         
-                        // 配合 150ms 淡出動畫，在畫面隱藏的瞬間將捲動軸「瞬間」重置回最上方
+                        // 配合 150ms 淡出動畫，在畫面隱藏的瞬間將雙重捲動軸「瞬間」重置回最上方
                         setTimeout(() => {
+                            window.scrollTo(0, 0); // 關鍵修復：確保手機全域視窗強制回到頂部
                             if (mainScrollArea.value) {
                                 mainScrollArea.value.classList.remove('scroll-smooth'); // 暫時移除平滑滾動以達到瞬間切換
                                 mainScrollArea.value.scrollTop = 0;
