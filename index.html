@@ -90,12 +90,13 @@
                             <circle cx="16.25" cy="8" r="2.75" fill="#E83929"/>
                         </g>
                     </svg>
+                    <!-- 修正置中：改用 items-center 並運用 pl 抵銷字距 (letter-spacing) 帶來的視覺右偏 -->
                     <div :class="splashStep >= 2 ? 'w-[72px] opacity-100 ml-3.5' : 'w-0 opacity-0 ml-0'" 
-                         class="overflow-hidden transition-all duration-[1000ms] ease-out-expo shrink-0 flex flex-col items-start justify-center">
+                         class="overflow-hidden transition-all duration-[1000ms] ease-out-expo shrink-0 flex flex-col items-center justify-center">
                         <div :class="splashStep >= 3 ? 'opacity-0' : 'opacity-100'" 
-                             class="flex flex-col items-start justify-center pt-1 transition-opacity duration-300 w-[72px]">
-                            <h1 class="text-[28px] font-bold tracking-[0.2em] text-muji-ink leading-none whitespace-nowrap">伴旅</h1>
-                            <p class="text-[10px] font-bold tracking-[0.35em] text-stone-400 uppercase mt-2 leading-none whitespace-nowrap">COTABI</p>
+                             class="flex flex-col items-center justify-center pt-1 transition-opacity duration-300 w-[72px]">
+                            <h1 class="text-[28px] font-bold tracking-[0.2em] text-muji-ink leading-none whitespace-nowrap pl-[0.2em]">伴旅</h1>
+                            <p class="text-[10px] font-bold tracking-[0.35em] text-stone-400 uppercase mt-2 leading-none whitespace-nowrap pl-[0.35em]">COTABI</p>
                         </div>
                     </div>
                 </div>
@@ -127,7 +128,6 @@
                                 <i :class="['ph-fill text-xl', tutorialSteps[tutorialStep].icon]"></i>
                             </div>
                             <div class="flex-1 pt-0.5">
-                                <!-- 修正文字顏色與粗細，確保長輩能清晰閱讀 -->
                                 <h3 class="text-base font-bold text-muji-ink mb-1.5 tracking-wide leading-tight">{{ tutorialSteps[tutorialStep].title }}</h3>
                                 <p class="text-[13.5px] text-stone-700 leading-relaxed font-medium">{{ tutorialSteps[tutorialStep].desc }}</p>
                             </div>
@@ -157,9 +157,10 @@
                     <circle cx="16.25" cy="8" r="2.75" fill="#E83929"/>
                     <rect x="13.5" y="12.5" width="5.5" height="7.5" rx="2.75" fill="#8E8D8A"/>
                 </svg>
-                <div class="flex flex-col items-start justify-center pt-0.5">
-                    <h1 class="text-[17px] font-bold tracking-[0.2em] text-muji-ink leading-none">伴旅</h1>
-                    <p class="text-[7.5px] font-bold tracking-[0.35em] text-stone-400 uppercase mt-1.5 leading-none">COTABI</p>
+                <!-- 修正置中：同樣使用 items-center 和 pl 調整字距 -->
+                <div class="flex flex-col items-center justify-center pt-0.5">
+                    <h1 class="text-[17px] font-bold tracking-[0.2em] text-muji-ink leading-none pl-[0.2em]">伴旅</h1>
+                    <p class="text-[7.5px] font-bold tracking-[0.35em] text-stone-400 uppercase mt-1.5 leading-none pl-[0.35em]">COTABI</p>
                 </div>
             </div>
 
@@ -375,7 +376,8 @@
                             <i class="ph-bold ph-translate text-muji-tech"></i> 隨身翻譯字卡
                         </h2>
                         <div class="space-y-3">
-                            <div v-for="phrase in phrases" :key="phrase.id" class="bg-muji-card rounded-2xl p-4 shadow-soft border border-stone-100 flex items-center justify-between transition-colors">
+                            <!-- 僅為第一個字卡加上 ID 供聚光燈定位，避免涵蓋範圍過大 -->
+                            <div v-for="(phrase, index) in phrases" :key="phrase.id" :id="index === 0 ? 'tools-translate-spot' : null" class="bg-muji-card rounded-2xl p-4 shadow-soft border border-stone-100 flex items-center justify-between transition-colors">
                                 <div class="flex-1 pr-2 active:opacity-50" @click="speakJapanese(phrase.ja)">
                                     <p class="text-[11px] font-medium tracking-wide text-stone-400 mb-1.5">{{ phrase.zh }}</p>
                                     <p class="text-[15px] font-medium text-muji-ink tracking-wide leading-snug">{{ phrase.ja }}</p>
@@ -566,7 +568,7 @@
                                 </div>
                             </div>
                             
-                            <!-- 完整修復：回程卡片 -->
+                            <!-- 回程卡片 -->
                             <div class="bg-white rounded-2xl shadow-soft border border-stone-200 overflow-hidden mt-4">
                                 <div class="bg-stone-50/50 p-5 flex justify-between items-center border-b border-stone-200 border-dashed relative">
                                     <div class="absolute -left-3 -bottom-3 w-6 h-6 bg-muji-bg rounded-full border-t border-r border-stone-200"></div>
@@ -813,7 +815,7 @@
                     { target: 'itinerary-spot-0', tab: 'itinerary', icon: 'ph-navigation-arrow text-muji-tech', title: '一鍵景點導航', desc: '點擊行程卡片上的「箭頭圖示」，就會自動開啟地圖，為您導航到該景點！' },
                     { target: 'nav-tools', tab: 'itinerary', icon: 'ph-hand-pointing text-muji-ink', title: '切換至工具', desc: '旅途中需要輔助嗎？請點擊底部的「工具」圖示，前往實用工具箱。' },
                     { target: 'tools-guide', tab: 'tools', icon: 'ph-airplane-takeoff text-stone-600', title: '通關懶人包', desc: '這裡備有「通關懶人包」，詳細圖文步驟帶您輕鬆完成機場報到與出入境手續。' },
-                    { target: 'tools-translate', tab: 'tools', icon: 'ph-translate text-muji-tech', title: '隨身翻譯字卡', desc: '點大聲公可自動播放語音，點放大鏡能全螢幕顯示文字給店員看，溝通無障礙。' },
+                    { target: 'tools-translate-spot', tab: 'tools', icon: 'ph-translate text-muji-tech', title: '隨身翻譯字卡', desc: '點大聲公可自動播放語音，點放大鏡能全螢幕顯示文字給店員看，溝通無障礙。' },
                     { target: 'nav-checklist', tab: 'tools', icon: 'ph-hand-pointing text-muji-ink', title: '切換至清單', desc: '出發前記得確認行李！請點擊底部的「清單」圖示，前往行前準備清單。' },
                     { target: 'checklist-area', tab: 'checklist', icon: 'ph-list-checks text-muji-ink', title: '行前準備清單', desc: '點擊項目即可打勾。右下角會顯示準備進度，確認達到 100% 就能安心出發！' },
                     { target: 'nav-vault', tab: 'checklist', icon: 'ph-hand-pointing text-muji-ink', title: '切換至保險箱', desc: '最後，請點擊底部的「保險箱」圖示，這裡存放了非常重要的隱私資訊。' },
