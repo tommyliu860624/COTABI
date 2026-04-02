@@ -176,7 +176,8 @@
         </header>
 
         <!-- Main Content Area -->
-        <main ref="mainScrollArea" class="flex-1 overflow-y-auto hide-scrollbar pb-32 relative scroll-smooth">
+        <!-- 🌟 修正：移除固定的 overflow-y-auto，改為動態判斷。只要有任何彈窗或教學正在顯示，就自動鎖死背景滾動 (overflow-hidden) -->
+        <main ref="mainScrollArea" class="flex-1 hide-scrollbar pb-32 relative scroll-smooth" :class="(showTutorialOverlay || showSOS || showGuide || fullscreenPhrase) ? 'overflow-hidden' : 'overflow-y-auto'">
             <transition name="fade" mode="out-in">
                 
                 <!-- Tab: 首頁 -->
