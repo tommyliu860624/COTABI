@@ -86,7 +86,8 @@
         
         <!-- 🚀 啟動畫面 -->
         <transition name="splash-fade">
-            <div v-if="showSplash" class="fixed inset-0 z-[9999] bg-muji-bg flex items-center justify-center overflow-hidden pointer-events-none">
+            <!-- 🌟 修正：改回 pointer-events-auto 並加上防滑動機制，徹底屏蔽開場動畫期間的所有互動 -->
+            <div v-if="showSplash" class="fixed inset-0 z-[9999] bg-muji-bg flex items-center justify-center overflow-hidden pointer-events-auto" @touchmove.prevent @wheel.prevent>
                 <div class="flex items-center justify-center">
                     <svg :class="splashStep >= 1 ? 'opacity-100 scale-100' : 'opacity-0 scale-75'" 
                          class="transform transition-all duration-[1000ms] ease-spring drop-shadow-sm w-[42px] h-[42px] overflow-visible shrink-0" 
@@ -744,7 +745,6 @@
 
         <!-- 🚨 SOS 緊急求助 Modal -->
         <transition name="bottom-sheet">
-            <!-- 🌟 修正：加入 .self 防護，僅在點擊或滑動「深色背景」時攔截，避免影響面板內部的可能滾動 -->
             <div v-if="showSOS" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-end justify-center" style="z-index: 3000;" @click.self="closeSOS" @touchmove.self.prevent @wheel.self.prevent>
                 <div class="sheet-panel bg-muji-bg w-full max-w-md rounded-t-[32px] p-6 pb-12 shadow-2xl flex flex-col relative">
                     <div class="flex justify-between items-center mb-8">
@@ -782,15 +782,14 @@
             </div>
         </transition>
 
-        <!-- 🧳 Guide Modal (通關懶人包) -->
+        <!-- 🧳 Guide Modal (通關懶人包 - 長輩專屬極致詳細版) -->
         <transition name="bottom-sheet">
-            <!-- 🌟 修正：加入 .self 防護，確保懶人包內部的文字可以正常上下滑動，但外層背景被鎖死 -->
             <div v-if="showGuide" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-end justify-center" style="z-index: 3000;" @click.self="closeGuide" @touchmove.self.prevent @wheel.self.prevent>
                 <div class="sheet-panel bg-muji-bg w-full max-w-md h-[85vh] rounded-t-[32px] shadow-2xl flex flex-col relative overflow-hidden">
                     <div class="flex justify-between items-center p-6 border-b border-stone-200/60 bg-white/50 backdrop-blur-md rounded-t-[32px] shrink-0">
                         <div>
                             <h2 class="text-lg font-bold tracking-widest text-muji-ink flex items-center gap-2"><i class="ph-fill ph-airplane-takeoff text-muji-tech"></i> 通關懶人包</h2>
-                            <p class="text-[10px] text-stone-400 mt-1 tracking-widest">照著步驟走，一點都不難！</p>
+                            <p class="text-[10px] text-stone-400 mt-1 tracking-widest">照著步驟走，第一次出國也不怕！</p>
                         </div>
                         <button @click="closeGuide" class="w-8 h-8 rounded-full bg-stone-200/50 flex items-center justify-center text-stone-500 active:scale-95 transition-all">
                             <i class="ph-bold ph-x"></i>
@@ -810,7 +809,7 @@
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-muji-tech text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 1</span>
-                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">出發地機場出境</h3>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">台灣機場 出境手續</h3>
                             </div>
                             <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
                                 <div class="space-y-6 relative">
@@ -818,27 +817,32 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">櫃檯報到與託運</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">拿出<span class="text-muji-ink font-medium">護照正本</span>換取登機證。行李放上輸送帶後，<span class="text-muji-accent font-medium">一定要看著它通過 X 光機</span>沒被攔下後再離開。（⚠️ 行動電源絕對不能託運，必須放在隨身包包）</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">把<span class="text-muji-ink font-medium">護照正本</span>交給地勤人員換取登機證。大行李箱放上輸送帶後，<span class="text-muji-accent font-medium">一定要看著它通過 X 光機螢幕</span>沒被攔下後再離開。（⚠️ <span class="font-medium underline">行動電源、鋰電池</span>絕對不能放行李箱託運，必須放在隨身包包帶上飛機！）</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">隨身行李安檢</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">把水壺的水倒光。將<span class="text-muji-ink font-medium">筆電、平板、雨傘</span>拿出來單獨放在塑膠籃裡。脫下外套並<span class="text-muji-accent font-medium">清空口袋</span>，走過金屬探測門。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">把水壺裡的水倒光。把包包裡的<span class="text-muji-ink font-medium">手機、平板、雨傘</span>拿出來單獨放在塑膠籃裡。脫下外套與金屬皮帶，並<span class="text-muji-accent font-medium">清空口袋內所有物品</span>，依照指示走過金屬探測門。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">證件查驗 (過海關)</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">走自動通關通道。將護照有照片那面朝下放上機台，脫下口罩看鏡頭即可通關。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">走「自動通關」通道。<span class="text-muji-accent font-medium">第一次出國也不用事前排隊申請！</span>直接把護照有照片那一頁「朝下」壓在機台玻璃上，閘門打開後走進去，<span class="text-muji-ink font-medium">脫下口罩看著螢幕鏡頭，並按壓雙手食指指紋</span>，即可同時完成註冊與通關。</p>
+                                    </div>
+                                    <div class="relative pl-8">
+                                        <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">4</div>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">前往登機門</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">查看登機證上的 <span class="font-mono text-muji-ink font-medium">Gate</span> (登機門) 號碼，並務必在<span class="text-muji-ink font-medium">起飛前 30 分鐘</span>抵達該登機門座位區等待廣播上飛機。</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- STEP 2: 抵達入境 -->
+                        <!-- STEP 2: 日本入境 -->
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-muji-accent text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 2</span>
-                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達目的地入境</h3>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達日本 入境手續</h3>
                             </div>
                             <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
                                 <div class="space-y-6 relative">
@@ -846,27 +850,27 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">檢疫與入境審查</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed"><span class="text-muji-ink font-medium">排外國人專用通道。</span>準備好線上入境條碼與護照。在櫃檯脫下帽子與口罩，依指示按壓指紋並拍照。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">下飛機後順著指標走，<span class="text-muji-accent font-medium">觀光客需排「外國人專用通道」</span>（不能走日本人的自動通關）。請先用手機開好 <span class="text-blue-600 font-medium border-b border-blue-200">Visit Japan Web (VJW) 的入境 QR Code</span>，連同護照交給海關人員。在櫃檯<span class="text-muji-ink font-medium">脫下帽子與口罩</span>，將雙手食指平壓在發光機器上，並直視前方小螢幕拍照。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
-                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">領取行李</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">看大螢幕尋找自己的航班號碼，確認轉盤號碼後前往領取託運行李。</p>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">領取行李 (Baggage Claim)</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">看頭頂的大螢幕尋找自己的航班號碼（如：酷航 TR 866），確認對應的「行李轉盤號碼」後，前往推車拿取託運行李。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">海關申報 (稅關)</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">在電子機台掃描護照與條碼。接著<span class="text-muji-accent font-medium">同行者可一起推著行李走到出口閘門</span>，即可正式入境！</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">拿到行李後，前往旁邊的「電子申報機台」。掃描護照以及 <span class="text-blue-600 font-medium border-b border-blue-200">VJW 的海關申報 QR Code</span>。機台亮綠燈後，<span class="text-muji-accent font-medium">同行家人可一起推著行李走到出口電子閘門</span>，閘門打開即可正式入境日本！</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- STEP 3: 當地出境 -->
+                        <!-- STEP 3: 日本出境 -->
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-stone-600 text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 3</span>
-                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">當地機場出境</h3>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">日本機場 出境手續</h3>
                             </div>
                             <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
                                 <div class="space-y-6 relative">
@@ -874,17 +878,17 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">櫃檯報到與託運</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">持護照換登機證並託運行李。<span class="text-muji-accent font-medium">注意：布丁、果凍、超過 100ml 的液體免稅品（如大罐保養品、酒類）絕對不能手提，必須放進大行李箱託運！</span></p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">持護照換登機證並託運行李。<span class="text-muji-accent font-medium">極度重要：在日本買的布丁、果凍、超過 100ml 的液體免稅品（如大罐化妝水、洗面乳、酒類）絕對不能手提上飛機，必須在報到時全部放進大行李箱託運！</span></p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">隨身行李安檢</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">與出發時相同，水壺需倒空，筆電與平板需單獨拿出過 X 光機。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">與出發時完全相同，水壺需倒空，筆電與平板需單獨拿出放入塑膠籃過 X 光機。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
-                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">海關 (稅關) 與出境</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">若有購買免稅品，在過自動通關前找「免稅手續機台」掃描護照。接著將護照放上機台掃描並辨識臉部出境。</p>
+                                        <h4 class="text-[13px] font-bold text-muji-ink mb-1">免稅確認 (稅關) 與出境</h4>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">若在日本有購買免稅品，請在過自動通關前找「免稅手續機台」，掃描護照即完成免稅確認（<span class="text-muji-accent font-medium">免稅透明袋絕對不能拆封</span>）。接著跟台灣一樣，將護照放上自動通關機台掃描並辨識臉部，即可前往免稅店購物與登機。</p>
                                     </div>
                                 </div>
                             </div>
@@ -894,7 +898,7 @@
                         <div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="bg-muji-tech text-white text-[10px] px-2 py-1 rounded font-mono tracking-widest">STEP 4</span>
-                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達台灣入境</h3>
+                                <h3 class="font-bold text-muji-ink tracking-widest text-sm">抵達台灣 入境手續</h3>
                             </div>
                             <div class="bg-white rounded-2xl p-5 shadow-soft border border-stone-200">
                                 <div class="space-y-6 relative">
@@ -902,7 +906,7 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">1</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">入境查驗</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed">準備好護照，走「自動通關」閘門掃描臉部即可快速入境。</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed">準備好護照，直接走「自動通關」閘門，掃描臉部即可快速入境台灣。</p>
                                     </div>
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">2</div>
@@ -912,7 +916,7 @@
                                     <div class="relative pl-8">
                                         <div class="absolute left-0 top-1 w-5 h-5 rounded-full bg-stone-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-stone-500">3</div>
                                         <h4 class="text-[13px] font-bold text-muji-ink mb-1">動植物檢疫與海關</h4>
-                                        <p class="text-[11px] text-muji-sub leading-relaxed"><span class="text-muji-accent font-medium">絕對不可攜帶肉乾、新鮮水果、含肉塊泡麵等違禁品！</span>若不確定買的伴手禮能不能帶，<span class="text-muji-ink font-medium">請主動走「紅線應申報檯」詢問海關</span>，避免面臨高額罰款。確認無誤後即可離開機場，歡迎回家！</p>
+                                        <p class="text-[11px] text-muji-sub leading-relaxed"><span class="text-muji-accent font-medium">絕對不可把日本的炸雞、肉乾、新鮮水果、含肉塊的泡麵帶回台灣！</span>若不確定買的伴手禮能不能帶（例如某些糕點），<span class="text-muji-ink font-medium">請主動走「紅線應申報檯」詢問海關</span>，主動詢問就算不能帶也只需丟棄，不會被罰款 20 萬元。確認無誤後即可走出機場，歡迎回家！</p>
                                     </div>
                                 </div>
                             </div>
