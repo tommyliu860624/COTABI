@@ -114,7 +114,8 @@
 
         <!-- 💡 動態教學導覽 -->
         <transition name="fade">
-            <div v-if="showTutorialOverlay" class="fixed inset-0 z-[9999] pointer-events-auto overflow-hidden" @click="nextTutorialStep">
+            <!-- 🌟 修正：加入 @touchmove.prevent 與 @wheel.prevent 強制攔截所有滑動事件，徹底解決背景滾動穿透 -->
+            <div v-if="showTutorialOverlay" class="fixed inset-0 z-[9999] pointer-events-auto overflow-hidden" @click="nextTutorialStep" @touchmove.prevent @wheel.prevent>
                 <div class="absolute inset-0 bg-transparent"></div>
                 <button @click.stop="closeTutorial" class="fixed top-6 left-6 text-white text-[11px] font-medium tracking-widest bg-stone-800/40 px-4 py-2 rounded-full backdrop-blur-md active:scale-95 z-50 transition-colors border border-white/10 hover:bg-stone-800/60">
                     跳過教學
@@ -720,7 +721,8 @@
 
         <!-- 全螢幕展開字卡 -->
         <transition name="fade">
-            <div v-if="fullscreenPhrase" class="fixed inset-0 bg-stone-900 flex items-center justify-center overflow-hidden" style="z-index: 5000;">
+            <!-- 🌟 修正：加入防滑動攔截 -->
+            <div v-if="fullscreenPhrase" class="fixed inset-0 bg-stone-900 flex items-center justify-center overflow-hidden" style="z-index: 5000;" @touchmove.prevent @wheel.prevent>
                 <button @click="closeFullscreen" class="absolute top-6 right-6 z-10 w-12 h-12 bg-white/10 border border-white/20 backdrop-blur-md rounded-full text-white active:scale-95 transition-transform"><i class="ph-light ph-x text-2xl"></i></button>
                 <div class="transform rotate-90 flex flex-col items-center justify-center text-center px-8 py-8" style="width: 100vh; height: 100vw;">
                     <div class="flex-1 flex flex-col items-center justify-center w-full min-h-0">
@@ -742,7 +744,8 @@
 
         <!-- 🚨 SOS 緊急求助 Modal -->
         <transition name="bottom-sheet">
-            <div v-if="showSOS" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-end justify-center" style="z-index: 3000;" @click.self="closeSOS">
+            <!-- 🌟 修正：加入 .self 防護，僅在點擊或滑動「深色背景」時攔截，避免影響面板內部的可能滾動 -->
+            <div v-if="showSOS" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-end justify-center" style="z-index: 3000;" @click.self="closeSOS" @touchmove.self.prevent @wheel.self.prevent>
                 <div class="sheet-panel bg-muji-bg w-full max-w-md rounded-t-[32px] p-6 pb-12 shadow-2xl flex flex-col relative">
                     <div class="flex justify-between items-center mb-8">
                         <h2 class="text-lg font-medium tracking-widest text-muji-accent flex items-center gap-2"><i class="ph-bold ph-warning-circle"></i> 緊急求助</h2>
@@ -781,7 +784,8 @@
 
         <!-- 🧳 Guide Modal (通關懶人包) -->
         <transition name="bottom-sheet">
-            <div v-if="showGuide" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-end justify-center" style="z-index: 3000;" @click.self="closeGuide">
+            <!-- 🌟 修正：加入 .self 防護，確保懶人包內部的文字可以正常上下滑動，但外層背景被鎖死 -->
+            <div v-if="showGuide" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm flex items-end justify-center" style="z-index: 3000;" @click.self="closeGuide" @touchmove.self.prevent @wheel.self.prevent>
                 <div class="sheet-panel bg-muji-bg w-full max-w-md h-[85vh] rounded-t-[32px] shadow-2xl flex flex-col relative overflow-hidden">
                     <div class="flex justify-between items-center p-6 border-b border-stone-200/60 bg-white/50 backdrop-blur-md rounded-t-[32px] shrink-0">
                         <div>
