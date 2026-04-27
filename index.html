@@ -315,7 +315,29 @@
                         </button>
                     </div>
 
-                    <div class="space-y-0 mt-2 relative">
+                    <!-- 🌟 新增：每日行程主題卡片 -->
+                    <div :key="activeDay" class="bg-white border border-stone-200 rounded-2xl p-4 mt-5 mb-2 relative overflow-hidden shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] animate-[fadeIn_0.3s_ease-out]">
+                        <div class="absolute -right-2 top-1/2 -translate-y-1/2 opacity-[0.03] text-7xl font-bold font-mono tracking-tighter pointer-events-none select-none">
+                            D{{ activeDay.replace('day','') }}
+                        </div>
+                        <div class="relative z-10 flex items-start gap-3">
+                            <div class="mt-1 w-1.5 h-8 bg-muji-accent rounded-full shrink-0"></div>
+                            <div class="flex-1">
+                                <p class="text-[9px] text-stone-400 font-bold tracking-widest uppercase mb-0.5 font-mono">Theme of the Day</p>
+                                <h3 class="text-[15px] font-bold text-muji-ink tracking-wide leading-snug">{{ currentDayItinerary.theme }}</h3>
+                                
+                                <!-- 🌟 新增：地理區域標籤 (Area Tags)，解決文藝標題地點不明的痛點 -->
+                                <div v-if="currentDayItinerary.areas" class="mt-2.5 flex flex-wrap gap-1.5">
+                                    <span v-for="area in currentDayItinerary.areas" :key="area" 
+                                          class="inline-flex items-center text-[10px] text-stone-500 bg-stone-50 border border-stone-200 px-2 py-0.5 rounded-full tracking-widest font-medium">
+                                        <i class="ph-fill ph-map-pin mr-1 text-stone-400/80 text-[10px]"></i>{{ area }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-0 mt-4 relative">
                         <div class="absolute left-[23px] top-4 bottom-4 w-[1px] bg-stone-200"></div>
                         
                         <div v-for="(item, index) in currentDayItinerary.spots" :key="item.id" class="relative pb-6">
@@ -336,7 +358,13 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <h3 class="text-base font-medium text-muji-ink mb-1.5 tracking-wide">{{ item.name }}</h3>
+                                    
+                                    <!-- 🌟 重新設計：將動作(Action)與地點(Name)拆分，排版更靈活不死板 -->
+                                    <div class="mb-2">
+                                        <h4 v-if="item.action" class="text-[10px] font-bold tracking-widest text-muji-accent mb-0.5">{{ item.action }}</h4>
+                                        <h3 class="text-base font-bold text-muji-ink tracking-wide leading-tight">{{ item.name }}</h3>
+                                    </div>
+                                    
                                     <p class="text-xs text-muji-sub leading-relaxed font-light" :class="{'mb-3': item.price || item.tags}">{{ item.desc }}</p>
                                     
                                     <div v-if="item.price || item.tags" class="flex flex-wrap gap-2">
@@ -609,7 +637,7 @@
                                     <div class="flex flex-col items-center px-4">
                                         <span class="text-[9px] font-mono border border-stone-300 px-2 py-0.5 rounded text-stone-500 mb-2">{{ decryptedVault.inbound.flightNo }}</span>
                                         <i class="ph-light ph-airplane-right text-stone-300 text-xl"></i>
-                                        <span class="text-[9px] text-stone-400 mt-1">酷航 Scoot</span>
+                                        <span class="text-[9px] text-stone-400 mt-1">樂桃 Peach</span>
                                     </div>
                                     <div class="text-center">
                                         <p class="text-3xl font-mono font-medium text-muji-ink">TPE</p>
@@ -1076,6 +1104,10 @@
                     chiyoda: { abbr: 'C', color: '#00BB85' }, 
                     hanzomon: { abbr: 'Z', color: '#8F76D6' }, 
                     shinjuku: { abbr: 'S', color: '#B0BF1E' }, 
+                    toei_asakusa: { abbr: 'A', color: '#E85298' }, // 🌟 新增：都營淺草線
+                    toei_mita: { abbr: 'I', color: '#0079C2' },     // 🌟 新增：都營三田線
+                    toei_oedo: { abbr: 'E', color: '#B6007A' },     // 🌟 新增：都營大江戶線
+                    fukutoshin: { abbr: 'F', color: '#9C5E31' },    // 🌟 新增：副都心線
                     jr_chuo: { abbr: 'JC', color: '#F15A22' }, 
                     jr_yamanote: { abbr: 'JY', color: '#99CC00' }, 
                     jr_sobu: { abbr: 'JB', color: '#FFD400' }, 
@@ -1089,12 +1121,12 @@
                     outbound: {
                         date: '030901071e09061e0009', // 解密後為: 2026/05/10
                         flightNo: '656b1309070f',     // 解密後為: TR 866
-                        time: '010f090501'            // 解密後為: 06:40
+                        time: '010f090504'            // 解密後為: 06:45
                     },
                     inbound: {
                         date: '030901071e09061e000f', // 解密後為: 2026/05/16
-                        flightNo: '656b1309080e',     // 解密後為: TR 897
-                        time: '000b090101'            // 解密後為: 12:00
+                        flightNo: '7c741307030e',     // 🌟 修正：正確的加密字串，解密後為 MM 627
+                        time: '030b090504'            // 解密後為: 22:45
                     },
                     members: [
                         { id: '1', nameZh: '劉育志', surname: 'LIU', givenName: 'YU-CHIH', passportNoEnc: '020f0a06060e000607', idNoEnc: '7008010107090709070a', gender: 'male', bloodType: 'B' },
@@ -1126,80 +1158,83 @@
                     return result;
                 };
 
-                // 🌟 更新：全行程「命名格式對齊」，航班與機場進出描述完全對稱
+                // 🌟 升級：副標題結構法 + 新增區域標籤 (areas) - 標籤極簡化防爆框
                 const itinerary = ref([
-                    { id: 'day1', title: '5/10 (日)', spots: [
-                        { id: '1-0', time: '03:30', name: '全員起床與準備', desc: '確認隨身物品、護照與手機，準備出發！', location: '出發地', type: 'hotel', transportToNext: { type: 'car', name: '專車 / 計程車', duration: '前往機場' } },
-                        { id: '1-1', time: '04:10', name: '抵達桃園機場 (第一航廈)', desc: '於第一航廈酷航櫃檯集合，辦理報到與託運手續。', location: '桃園國際機場 第一航廈', type: 'transit', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳/候機室' } },
-                        { id: '1-2', time: '05:10', name: '早餐時間', desc: '桃園機場或機上彈性用餐。', location: '桃園機場 / 機上', price: '彈性預算', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '前往登機門' } },
-                        { id: '1-3', time: '06:40', name: '搭機前往東京', desc: '班機準備起飛，展開這趟美好的旅程！', location: '桃園國際機場', type: 'transit', transportToNext: { type: 'plane', name: '酷航 TR866', duration: '約 4 小時 20 分鐘' } },
-                        { id: '1-4', time: '11:00', name: '抵達成田機場 (第一航廈)', desc: '辦理入境通關手續，並領取託運行李。', location: '成田國際機場 第一航廈', type: 'transit', transportToNext: { type: 'walk', name: '步行至地下車站', duration: '約 15 分鐘' } },
-                        { id: '1-5', time: '12:15', name: '轉乘京成電鐵', desc: '臨櫃刷 IC 卡加購特急券，搭乘 Skyliner 前往上野。', location: '成田機場站', price: '單程 ¥2,570', type: 'transit', transportToNext: { type: 'train', line: 'keisei_skyliner', name: 'Skyliner (京成電鐵)', duration: '約 41 分鐘' } },
-                        { id: '1-6', time: '13:15', name: '抵達上野小築', desc: '抵達住宿地點卸下行李。午餐於附近超商快速解決。', location: '上野小築', price: '車資約 ¥1,200', type: 'hotel', transportToNext: { type: 'train', lines: ['ginza', 'jr_sobu'], name: '地鐵銀座線 轉 JR總武線', duration: '約 35 分鐘' } },
-                        { id: '1-7', time: '14:30', name: '北新宿尋根之旅', desc: '自大久保站北口出站步行。此為家族最重要之踩點行程。', location: '東京都新宿区北新宿4丁目32', tags: ['家族尋根'], type: 'sight', transportToNext: { type: 'train', line: 'jr_yamanote', name: 'JR山手線', duration: '約 20 分鐘' } },
-                        { id: '1-8', time: '17:30', name: '澀谷十字路口觀景', desc: '至 MAGNET by SHIBUYA109 從頂樓俯瞰澀谷地標路口。', location: 'MAGNET by SHIBUYA109', url: 'https://magnetbyshibuya109.jp/shop/crossing-view/', price: '門票約 ¥1,000', type: 'sight', transportToNext: { type: 'train', line: 'jr_yamanote', name: 'JR山手線', duration: '約 20 分鐘' } },
-                        { id: '1-9', time: '19:30', name: '人形町今半 (新宿高島屋店)', desc: '享用頂級黑毛和牛壽喜燒，體驗優雅的日式用餐環境。', location: '人形町今半 新宿高島屋店', url: 'https://imahan-tokyo.com/official/zh-hant/', price: '約 ¥10,000 - ¥15,000', tags: ['需提前預約'], type: 'food', transportToNext: { type: 'train', lines: ['marunouchi', 'ginza'], name: '地鐵丸之內線 轉 銀座線', duration: '約 35 分鐘' } },
-                        { id: '1-10', time: '21:30', name: '返回住宿', desc: '自稻荷町站步行回到住宿休息。', location: '上野小築', type: 'hotel' }
+                    { id: 'day1', title: '5/10 (日)', theme: '序幕初啟 ‧ 擁抱市井煙火與初夜微醺', areas: ['上野', '御徒町'], spots: [
+                        { id: '1-0', time: '02:30', name: '專車接送', action: '啟程出發', desc: '預約專車機場接送服務。確認護照、手機與錢包皆已隨身攜帶。', location: '溫暖的家', type: 'hotel', transportToNext: { type: 'car', name: '專車 / 計程車', duration: '前往機場' } },
+                        { id: '1-1', time: '06:45', name: '酷航 TR866', action: '搭機前往東京', desc: '辦理登機手續與行李託運。航程約 3.5 小時，可在機上稍作休息。', location: '桃園機場 第一航廈', type: 'transit', transportToNext: { type: 'plane', name: '酷航 TR866', duration: '約 3.5 小時' } },
+                        { id: '1-2', time: '11:15', name: '成田機場 T1', action: '入境通關 ‧ 領取車票', desc: '出示 VJW 條碼辦理入境審查與海關申報。完成後前往 B1 櫃檯兌換 Skyliner 車票。', location: '成田機場 第一航廈', type: 'transit', transportToNext: { type: 'walk', name: '步行', duration: '前往地下車站' } },
+                        { id: '1-3', time: '12:40', name: '京成 Skyliner', action: '特急列車直達市區', desc: '搭乘對號特急列車直達京成上野站。車程約 41 分鐘，可欣賞沿途關東郊區風景。', location: '成田機場地下車站', type: 'transit', transportToNext: { type: 'train', lines: ['keisei_skyliner'], name: 'Skyliner (京成電鐵)', duration: '直達上野' } },
+                        { id: '1-4', time: '14:00', name: '上野小築', action: '抵達民宿 ‧ 放置行李', desc: '前往本次旅程的住宿據點寄放重型行李。稍作整理後正式展開東京探索。', location: '上野小築 (入谷)', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往上野商圈' } },
+                        { id: '1-5', time: '14:30', name: 'Wendy\'s First Kitchen', action: '午餐 ‧ 日式連鎖速食', desc: '於上野車站淺草口附近享用日式速食。體驗快速且具在地特色的連鎖漢堡。', location: '上野車站周邊', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '前往商圈' } },
+                        { id: '1-6', time: '15:30', name: '上野・御徒町商圈', action: '生活採買 ‧ JDM 初探', desc: '巡禮 Yamashiroya 玩具大樓與尋找二手 K8 模型。隨後於多慶屋買齊本週所需之飲用水與零食。', location: '上野・御徒町商圈', type: 'shop', tags: ['地標紫色大樓', '特定退稅櫃檯'], transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
+                        { id: '1-7', time: '19:00', name: '鳥貴族 (上野中央通店)', action: '晚餐 ‧ 國民均一價居酒屋', desc: '品嚐日本國民均一價串燒居酒屋。舉杯慶祝本次旅程正式平安展開。', location: '上野中央通', type: 'food', tags: ['使用平板點餐', '建議搭配翻譯'], transportToNext: { type: 'walk', name: '步行', duration: '約 12 分鐘' } },
+                        { id: '1-8', time: '21:00', name: '上野小築', action: '返回住宿 ‧ 洗漱休息', desc: '結束第一天的舟車勞頓。洗去一身疲憊，為明天的豐富行程儲備體力。', location: '上野小築', type: 'hotel' }
                     ]},
-                    { id: 'day2', title: '5/11 (一)', spots: [
-                        { id: '2-0', time: '08:30', name: '全員起床與準備', desc: '梳洗完畢準備展開今天的淺草文化與晴空塔之旅。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
-                        { id: '2-1', time: '09:00', name: '早餐時間', desc: '住宿周邊彈性處理。', location: '上野小築周邊', price: '約 ¥1,000', type: 'food', transportToNext: { type: 'train', line: 'ginza', name: '地鐵銀座線', duration: '前往淺草' } },
-                        { id: '2-2', time: '10:00', name: '淺草寺與仲見世通', desc: '收集雷門御朱印，漫步仲見世通體驗淺草老街文化。', location: '淺草寺', type: 'sight', transportToNext: { type: 'bus', line: 'toei_bus', name: '都營巴士 (東42系統)', duration: '約 10 分鐘' } },
-                        { id: '2-3', time: '11:30', name: '今戶神社', desc: '造訪招財貓發源地，收集特色貓咪御朱印。', location: '今戶神社', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '約 15 分鐘' } },
-                        { id: '2-4', time: '13:00', name: '尾張屋 (淺草本店)', desc: '160 年歷史老店，品嚐炸蝦紮實、清爽的道地蕎麥麵與天婦羅。', location: '尾張屋 本店', url: 'https://tabelog.com/tokyo/A1311/A131102/13003666/', price: '約 ¥2,500 - ¥4,000', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '約 20 分鐘' } },
-                        { id: '2-5', time: '15:00', name: '東京晴空塔', desc: '登塔俯瞰東京市區全景。', location: '東京晴空塔', url: 'https://www.tokyo-skytree.jp/en/ticket/', price: '套票約 ¥3,100', tags: ['需提前預約'], type: 'sight', transportToNext: { type: 'walk', name: '館內步行', duration: '約 10 分鐘' } },
-                        { id: '2-6', time: '17:30', name: 'Tomica Shop (晴空塔店)', desc: '位於晴空塔 4 樓，尋找日本限定比例模型車。', location: 'Tomica Shop', type: 'shop', transportToNext: { type: 'walk', name: '館內步行', duration: '約 10 分鐘' } },
-                        { id: '2-7', time: '19:00', name: '駒形前川 (淺草本店)', desc: '200 年鰻魚名店。邊吃邊從窗邊欣賞晴空塔夜景，景色與口味雙重享受。', location: '駒形前川 淺草本店', url: 'https://www.unagi-maekawa.com/', price: '約 ¥6,000 - ¥10,000', type: 'food', transportToNext: { type: 'train', lines: ['hanzomon', 'ginza'], name: '地鐵半藏門線 轉 銀座線', duration: '約 25 分鐘' } },
-                        { id: '2-8', time: '21:00', name: '返回住宿', desc: '自稻荷町站步行回到住宿休息。', location: '上野小築', type: 'hotel' }
+                    { id: 'day2', title: '5/11 (一)', theme: '浮世時光 ‧ 尋訪江戶餘韻與魔幻夕照', areas: ['淺草', '晴空塔'], spots: [
+                        { id: '2-0', time: '08:00', name: '上野小築周邊', action: '出發 ‧ 簡易早餐', desc: '早晨於住宿點周邊超商購買飯糰或麵包。簡單補充體力後開始今日的淺草巡禮。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '約 15 分鐘' } },
+                        { id: '2-1', time: '09:30', name: '合羽橋道具街', action: '職人文化 ‧ 道具街漫步', desc: '由北向南悠闲散步，觀察精緻的食品模型與職人廚具。深度感受東京傳統商業區的文化底蘊。', location: '合羽橋道具街', type: 'shop', transportToNext: { type: 'walk', name: '步行', duration: '前往淺草' } },
+                        { id: '2-2', time: '11:30', name: '駒形前川 (淺草本店)', action: '午餐 ‧ 百年鰻魚飯', desc: '享用傳承 200 年歷史的精緻鰻魚飯午間套餐。品嚐老店手藝的同時，從窗邊欣賞隅田川美景。', location: '淺草 駒形', type: 'food', tags: ['午間套餐 CP 值極高'], transportToNext: { type: 'walk', name: '步行', duration: '前往淺草寺' } },
+                        { id: '2-3', time: '13:30', name: '淺草寺 ‧ 仲見世通', action: '參拜祈福 ‧ 經典江戶攝影', desc: '穿越雷門燈籠，沿著仲見世通漫步至本堂參拜。捕捉江戶時代風格的經典建築構圖。', location: '淺草寺區域', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '前往今戶神社' } },
+                        { id: '2-4', time: '15:30', name: '今戶神社', action: '參拜 ‧ 招財貓發源地', desc: '前往位於淺草邊緣的招財貓發源地。拍攝兩隻一組的石雕貓，享受幽靜的神社氛圍。', location: '今戶神社', type: 'sight', tags: ['17:00 關門', '16:30 前完成購買御守'], transportToNext: { type: 'bus', lines: ['toei_bus'], name: '都營公車 / 步行', duration: '前往晴空塔' } },
+                        { id: '2-5', time: '17:00', name: '東京晴空塔', action: '登塔觀景 ‧ 魔幻夕照', desc: '登塔俯瞰壯闊的東京全景，捕捉魔幻時刻的日落夕照。隨後於晴空街道 (Solamachi) 尋找特色伴手禮。', location: '東京晴空塔', type: 'sight', transportToNext: { type: 'train', lines: ['toei_asakusa'], name: '都營淺草線', duration: '返回淺草' } },
+                        { id: '2-6', time: '19:30', name: '尾張屋 (淺草本店)', action: '晚餐 ‧ 招牌炸蝦蕎麥麵', desc: '造訪淺草百年老店，品嚐招牌巨型炸蝦與手工蕎麥麵。感受麵體與柴魚湯底的深度風味。', location: '淺草 本店', type: 'food', transportToNext: { type: 'train', lines: ['ginza'], name: '銀座線 ➔ 步行', duration: '返回住宿' } },
+                        { id: '2-7', time: '21:00', name: '上野小築', action: '返回住宿 ‧ 洗漱休息', desc: '帶著淺草的復古回憶回到住宿點。整理今日拍攝的照片並放鬆休息。', location: '上野小築', type: 'hotel' }
                     ]},
-                    { id: 'day3', title: '5/12 (二)', spots: [
-                        { id: '3-0', time: '08:00', name: '全員起床與準備', desc: '今日將前往早稻田與吉祥寺一帶探索。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
-                        { id: '3-1', time: '08:30', name: '早餐時間', desc: '住宿周邊彈性處理。', location: '上野小築周邊', price: '約 ¥1,000', type: 'food', transportToNext: { type: 'train', lines: ['ginza', 'tozai'], name: '地鐵銀座線 轉 東西線', duration: '約 40 分鐘' } },
-                        { id: '3-2', time: '09:30', name: '法輪寺', desc: '拍攝極美的季節限定「花手水」景觀。', location: '法輪寺 早稻田', type: 'sight', transportToNext: { type: 'train', lines: ['tozai', 'jr_chuo'], name: '地鐵東西線 轉 JR中央線', duration: '約 40 分鐘' } },
-                        { id: '3-3', time: '11:30', name: '吉祥寺 Petit 村', desc: '探索宛如吉卜力世界的夢幻童話風格貓村。', location: '吉祥寺 Petit 村', url: 'https://temarinooshiro.com/', price: '入場費約 ¥1,600', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '約 6 分鐘' } },
-                        { id: '3-4', time: '13:00', name: '挽肉與米 (吉祥寺店)', desc: '炭火直球對決的現烤漢堡排，搭配現炊白飯，極具特色。', location: '挽肉と米 吉祥寺', url: 'https://www.tablecheck.com/zh-TW/shops/hikinikutokome/reserve', price: '約 ¥1,800', tags: ['需線上預約'], type: 'food', transportToNext: { type: 'taxi', name: '計程車', duration: '車資約 ¥1,800' } },
-                        { id: '3-5', time: '14:30', name: 'TYPE ONE (Spoon Sports)', desc: '位於杉並區桃井的 JDM 車迷朝聖地。', location: 'TYPE ONE', url: 'https://www.spoon.jp/', type: 'shop', transportToNext: { type: 'bus', name: '公車 / 步行', duration: '前往西荻窪' } },
-                        { id: '3-6', time: '16:30', name: '西荻窪古董街', desc: '走訪周邊充滿昭和風情的古董店與喫茶店。', location: '西荻窪古董街', type: 'sight', transportToNext: { type: 'train', line: 'jr_chuo', name: 'JR中央快速線', duration: '約 5 分鐘' } },
-                        { id: '3-7', time: '19:00', name: '鳥貴族 (吉祥寺店)', desc: '均一價平價雞肉串燒居酒屋。在逛街後放鬆用餐的最佳選擇。', location: '鳥貴族 吉祥寺店', url: 'https://map.torikizoku.co.jp/store/199', price: '約 ¥2,000 - ¥3,000', tags: ['現場抽候位'], type: 'food', transportToNext: { type: 'train', lines: ['jr_chuo', 'ginza'], name: 'JR中央快速線 轉 地鐵銀座線', duration: '約 45 分鐘' } },
-                        { id: '3-8', time: '21:00', name: '返回住宿', desc: '自稻荷町站步行回到住宿休息。', location: '上野小築', type: 'hotel' }
+                    { id: 'day3', title: '5/12 (二)', theme: '舊夢尋跡 ‧ 漫遊城西綠意與昭和日常', areas: ['新宿', '杉並', '吉祥寺'], spots: [
+                        { id: '3-0', time: '08:00', name: '上野車站周邊', action: '出發 ‧ 車站早餐', desc: '今日行程較遠，於車站周邊享用早餐後準備搭車。出發前往新宿區進行尋根之旅。', location: '上野小築', type: 'hotel', transportToNext: { type: 'train', lines: ['jr_yamanote', 'jr_sobu'], name: '山手線 ➔ 總武線', duration: '前往大久保/新宿' } },
+                        { id: '3-1', time: '09:30', name: '北新宿 4-32', action: '感性尋根 ‧ 外公故居走訪', desc: '前往北新宿進行感性的尋根之旅。實地漫步於外公曾居住過的街道與生活環境。', location: '北新宿', type: 'sight', transportToNext: { type: 'train', lines: ['tozai'], name: '東西線', duration: '前往早稻田' } },
+                        { id: '3-2', time: '11:00', name: '法輪寺', action: '花手水 ‧ 絕美底片攝影', desc: '參訪以精緻「花手水」聞名的法輪寺。絕佳的靜物攝影題材，非常適合使用底片相機記錄。', location: '早稻田', type: 'sight', transportToNext: { type: 'train', lines: ['tozai', 'jr_chuo'], name: '東西線 ➔ 中央線', duration: '前往荻窪' } },
+                        { id: '3-3', time: '12:30', name: '春木家本店 (天沼店)', action: '午餐 ‧ 昭和古早味拉麵', desc: '體驗傳承自昭和時代的古早味中華拉麵。感受隱身於住宅區中溫馨且具家庭感的用餐氛圍。', location: '荻窪 (天沼店)', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '前往 TYPE ONE' } },
+                        { id: '3-4', time: '14:00', name: 'Spoon Sports (TYPE ONE)', action: 'JDM 朝聖 ‧ Honda 精神支柱', desc: '朝聖 JDM Honda 車迷的精神支柱。觀摩現場施工中的競技改裝車與經典車款靜態展示。', location: '荻窪', type: 'shop', transportToNext: { type: 'train', lines: ['jr_chuo'], name: 'JR 中央線', duration: '前往阿佐谷' } },
+                        { id: '3-5', time: '15:30', name: '阿佐谷神明宮', action: '參拜祈福 ‧ 求取神結御守', desc: '探訪寧靜的神明宮，求取全國知名的編織「神結」御守。欣賞精緻的刺繡工藝與神社建築。', location: '阿佐谷', type: 'sight', tags: ['先買御守再逛神社', '社務所傍晚休息'], transportToNext: { type: 'train', lines: ['jr_chuo'], name: 'JR 中央線', duration: '前往吉祥寺' } },
+                        { id: '3-6', time: '17:00', name: '吉祥寺商圈', action: '文藝漫步 ‧ 商店街巡禮', desc: '穿梭於中道通與口琴橫丁的特色商店街。特別造訪充滿童話風格的「貓咪吉祥寺 Petit 村」。', location: '吉祥寺商圈', type: 'sight', tags: ['Pikmin Bloom 偵測'], transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
+                        { id: '3-7', time: '19:00', name: 'COFFEE HALL くぐつ草', action: '晚餐 ‧ 洞窟傳統咖哩', desc: '隱身於地底洞窟建築內的特色咖啡廳。享用費時熬煮的濃縮傳統咖哩飯，體驗極致的空間張力。', location: '吉祥寺', type: 'food', transportToNext: { type: 'train', lines: ['jr_chuo', 'jr_yamanote'], name: '中央線 ➔ 山手線', duration: '返回上野' } },
+                        { id: '3-8', time: '21:00', name: '上野小築', action: '返回住宿 ‧ 洗漱休息', desc: '結束充滿回憶與 JDM 熱血的一天。搭乘電車返回上野，洗漱休息。', location: '上野小築', type: 'hotel' }
                     ]},
-                    { id: 'day4', title: '5/13 (三)', spots: [
-                        { id: '4-0', time: '08:30', name: '全員起床與準備', desc: '今日安排感受老東京柴又風情與原宿街頭潮流。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
-                        { id: '4-1', time: '09:00', name: '早餐時間', desc: '住宿周邊彈性處理。', location: '上野小築周邊', price: '約 ¥1,000', type: 'food', transportToNext: { type: 'train', line: 'keisei', name: '京成電鐵', duration: '前往柴又' } },
-                        { id: '4-2', time: '10:00', name: '柴又老街與矢切之渡', desc: '漫步昭和木造老街，體驗傳統人力渡船。', location: '柴又帝釋天周邊', price: '渡船約 ¥200', type: 'sight', transportToNext: { type: 'train', lines: ['keisei', 'jr_yamanote'], name: '京成線 轉 JR山手線', duration: '約 45 分鐘' } },
-                        { id: '4-3', time: '12:30', name: '川千家', desc: '品嚐柴又當地具有百年歷史的鰻魚飯名店。', location: '川千家', url: 'https://www.kawachiya.biz/', price: '約 ¥4,000 - ¥7,000', type: 'food', transportToNext: { type: 'train', lines: ['keisei', 'jr_yamanote'], name: '京成金町線 轉 JR山手線', duration: '約 50 分鐘' } },
-                        { id: '4-4', time: '14:30', name: '原宿貓街與 Liberty Walk', desc: '穿越竹下通與貓街步道，前往 Liberty Walk 朝聖潮流車文化。', location: 'LB Tokyo', url: 'https://libertywalk.co.jp/', type: 'shop', transportToNext: { type: 'train', line: 'jr_yamanote', name: 'JR山手線', duration: '約 10 分鐘' } },
-                        { id: '4-5', time: '18:30', name: '壽司郎 (澀谷站前店)', desc: '於澀谷鬧區享用平價美味的迴轉壽司。', location: '壽司郎 澀谷站前店', url: 'https://www.akindo-sushiro.co.jp/', price: '約 ¥2,000 - ¥3,000', type: 'food', transportToNext: { type: 'train', line: 'ginza', name: '地鐵銀座線 (始發站)', duration: '約 30 分鐘' } },
-                        { id: '4-6', time: '20:30', name: '返回住宿', desc: '自稻荷町站步行回到住宿休息。', location: '上野小築', type: 'hotel' }
+                    { id: 'day4', title: '5/13 (三)', theme: '幻都逐夢 ‧ 迷走科技叢林與舌尖奢享', areas: ['日本橋', '秋葉原'], spots: [
+                        { id: '4-0', time: '07:30', name: '上野小築周邊', action: '出發 ‧ 簡易早餐', desc: '早起出發，為避開人潮先在附近吃點簡單早餐墊胃。準備迎接充滿科技與次文化魅力的秋葉原之日。', location: '上野小築', type: 'hotel', transportToNext: { type: 'train', lines: ['hibiya'], name: '東京地鐵日比谷線', duration: '前往人形町' } },
+                        { id: '4-1', time: '08:30', name: '小網神社', action: '參拜祈福 ‧ 強運洗錢', desc: '造訪東京知名的強運厄除與洗錢名所。趁早完成合法「洗錢」儀式，祈求財運亨通。', location: '日本橋', type: 'sight', tags: ['準備日圓鈔票洗錢'], transportToNext: { type: 'train', lines: ['hibiya'], name: '東京地鐵日比谷線', duration: '前往秋葉原' } },
+                        { id: '4-2', time: '10:30', name: '秋葉原商圈', action: '科技尋寶 ‧ 電器街巡禮', desc: '鎖定 Yodobashi-Akiba 巨型綜合商場與周邊電子零件街。盡情探索最新 3C 科技、相機設備與各式家電。', location: '秋葉原', type: 'shop', tags: ['可自由探索電子街'], transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
+                        { id: '4-3', time: '12:30', name: '牛かつ もと村', action: '午餐 ‧ 軟嫩炸牛排定食', desc: '品嚐超人氣炸牛排定食。於個人石盤上自行烘烤調整熟度，肉質軟嫩多汁且口感極佳。', location: '秋葉原', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '繼續逛街' } },
+                        { id: '4-4', time: '14:00', name: '舊萬世橋鐵道 ‧ 巷弄', action: '深度探索 ‧ 街頭建築攝影', desc: '繼續補完上午未逛完的特色電子店鋪與音響專賣店。隨後沿著舊萬世橋鐵道區域進行街頭建築攝影。', location: '秋葉原周邊', type: 'shop', transportToNext: { type: 'train', lines: ['jr_yamanote', 'toei_oedo'], name: '山手線 ➔ 大江戶線', duration: '前往本鄉三丁目' } },
+                        { id: '4-5', time: '18:30', name: '房家 (本鄉三丁目二號店)', action: '晚餐 ‧ 和牛一頭燒肉盛宴', desc: '主打全牛買斷的高品質和牛燒肉盛宴。用極致的霜降和牛，為今日的豐富行程劃下完美句點。', location: '本鄉三丁目 (二號店)', type: 'food', tags: ['建議提前預約', '推薦一頭牛盛合'], transportToNext: { type: 'train', lines: ['toei_oedo'], name: '大江戶線 ➔ 步行', duration: '返回住宿' } },
+                        { id: '4-6', time: '20:30', name: '上野小築', action: '返回住宿 ‧ 洗漱休息', desc: '帶著和牛的滿足感與滿滿的戰利品回到民宿。整理今日的豐碩成果並好好休息。', location: '上野小築', type: 'hotel' }
                     ]},
-                    { id: 'day5', title: '5/14 (四)', spots: [
-                        { id: '5-0', time: '08:30', name: '全員起床與準備', desc: '今日行程集中在上野公園與谷中一帶。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
-                        { id: '5-1', time: '09:00', name: '早餐時間', desc: '住宿周邊彈性處理。', location: '上野小築周邊', price: '約 ¥1,000', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '約 10 分鐘' } },
-                        { id: '5-2', time: '10:00', name: '上野動物園', desc: '參觀可愛熊貓，園內設有大量長椅適合休憩。', location: '上野動物園', url: 'https://www.tokyo-zoo.net/zoo/ueno/', price: '門票 ¥600', type: 'sight', transportToNext: { type: 'walk', name: '步行 (經池之端門)', duration: '約 15 分鐘' } },
-                        { id: '5-3', time: '12:30', name: '上野精養軒 (本店)', desc: '品嚐日本洋食發源地之一的知名百年老店。', location: '上野精養軒 本店', url: 'https://www.seiyoken.co.jp/', price: '約 ¥3,000 - ¥5,000', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '約 15 分鐘' } },
-                        { id: '5-4', time: '14:30', name: '根津神社', desc: '漫步壯觀的迷你千本鳥居隧道，並收集特色御朱印。', location: '根津神社', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '約 15 分鐘' } },
-                        { id: '5-5', time: '16:00', name: '谷中銀座', desc: '在夕陽階梯拍照留念，漫步充滿昭和風情的商店街。', location: '谷中銀座商店街', type: 'sight', transportToNext: { type: 'train', line: 'jr_yamanote', name: 'JR山手線', duration: '約 15 分鐘' } },
-                        { id: '5-6', time: '18:30', name: '房家 (上野六丁目店)', desc: 'A5 黑毛和牛專業「一頭買」燒肉店，體驗純日式和牛燒肉。', location: '和牛一頭買 燒肉房家 上野六丁目店', url: 'https://www.bou-ya.com/', price: '約 ¥5,000 - ¥8,000', tags: ['建議預約'], type: 'food', transportToNext: { type: 'train', line: 'hibiya', name: '地鐵日比谷線', duration: '約 10 分鐘' } },
-                        { id: '5-7', time: '20:30', name: '返回住宿', desc: '自入谷站步行回到住宿休息。', location: '上野小築', type: 'hotel' }
+                    { id: 'day5', title: '5/14 (四)', theme: '摩登行板 ‧ 穿梭藝文林蔭與璀璨夜都', areas: ['世田谷', '中目黑', '澀谷'], spots: [
+                        { id: '5-0', time: '08:00', name: '轉乘車站周邊', action: '出發 ‧ 簡易早餐', desc: '出發前往世田谷區，可在轉乘車站附近購買早餐。今日將探索充滿文藝與潮流氣息的城西地區。', location: '上野小築', type: 'hotel', transportToNext: { type: 'train', lines: ['hibiya', 'chiyoda'], name: '日比谷 ➔ 千代田直通小田急', duration: '前往豪德寺' } },
+                        { id: '5-1', time: '09:30', name: '豪德寺', action: '參拜 ‧ 千隻招財貓攝影', desc: '被上千隻招財貓包圍的極致視覺饗宴。早晨光線清亮，漫步於寧靜的寺院內感受祥和氛圍。', location: '世田谷', type: 'sight', transportToNext: { type: 'train', name: '世田谷線 / 田園都市線', duration: '前往中目黑' } },
+                        { id: '5-2', time: '11:30', name: '星巴克臻選® 東京烘焙工坊', action: '品味咖啡 ‧ 觀賞烘豆工藝', desc: '造訪全球僅有幾間的奢華星巴克旗艦店。近距離觀察巨型烘豆機運作，並於露台欣賞目黑川美景。', location: '中目黑', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '前往代官山' } },
+                        { id: '5-3', time: '13:00', name: '代官山 ‧ 蔦屋書店', action: '文藝散策 ‧ 質感伴手禮', desc: '巡禮號稱全球最美書店的蔦屋書店 (T-Site)。隨後前往 NUMBER SUGAR 購買高質感的職人手工焦糖。', location: '代官山', type: 'shop', transportToNext: { type: 'train', lines: ['fukutoshin'], name: '副都心線 (直通)', duration: '前往原宿' } },
+                        { id: '5-4', time: '14:30', name: '東鄉神社', action: '參拜祈福 ‧ 求取勝利御守', desc: '隱身於原宿喧囂商圈內的靜謐之處。參拜東鄉平八郎，求取著名的「勝利御守」。', location: '原宿', type: 'sight', tags: ['17:00 休息'], transportToNext: { type: 'walk', name: '步行', duration: '前往表參道' } },
+                        { id: '5-5', time: '15:30', name: '原宿 ‧ 表參道', action: '潮流朝聖 ‧ JDM 服飾', desc: '穿梭表參道逛 LIBERTY WALK TOKYO 與 Kiddy Land。可順道品嚐 LUKE\'S LOBSTER 龍蝦堡與伊良可樂。', location: '原宿・表參道', type: 'shop', tags: ['推薦: LUKE\'S LOBSTER 龍蝦堡', '伊良可樂'], transportToNext: { type: 'train', lines: ['jr_yamanote'], name: 'JR 山手線', duration: '前往澀谷' } },
+                        { id: '5-6', time: '18:30', name: 'MAGNET 109 展望台', action: '澀谷十字路口 ‧ 夜景攝影', desc: '由高處俯瞰全球最繁忙的澀谷十字路口。捕捉入夜後的繁華霓虹與川流不息的車流軌跡。', location: '澀谷', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
+                        { id: '5-7', time: '20:00', name: '活美登利 (西武店)', action: '晚餐 ‧ 超人氣迴轉壽司', desc: '大啖高 CP 值的排隊名店壽司。食材新鮮且品項豐富，徹底滿足對日本海鮮的渴望。', location: '澀谷 (西武店)', type: 'food', tags: ['需預留排隊時間'], transportToNext: { type: 'train', lines: ['ginza'], name: '銀座線', duration: '返回上野' } },
+                        { id: '5-8', time: '22:00', name: '上野小築', action: '返回住宿 ‧ 洗漱休息', desc: '結束橫跨多個潮流商圈的充實一日。提著滿手的伴手禮返回民宿休息。', location: '上野小築', type: 'hotel' }
                     ]},
-                    { id: 'day6', title: '5/15 (五)', spots: [
-                        { id: '6-0', time: '08:00', name: '全員起床與準備', desc: '旅程倒數第二天，將前往招財貓聖地與秋葉原。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
-                        { id: '6-1', time: '08:45', name: '早餐時間', desc: '住宿周邊彈性處理。', location: '上野小築周邊', price: '約 ¥1,000', type: 'food', transportToNext: { type: 'train', lines: ['hibiya', 'chiyoda'], name: '地鐵日比谷線 轉 千代田線', duration: '約 35 分鐘' } },
-                        { id: '6-2', time: '10:15', name: '豪德寺', desc: '造訪招財貓聖地，購買可愛御守並觀賞萬隻招財貓海奇觀。', location: '豪徳寺', type: 'sight', transportToNext: { type: 'train', lines: ['chiyoda', 'shinjuku'], name: '地鐵千代田線 轉 都營新宿線', duration: '約 35 分鐘' } },
-                        { id: '6-3', time: '12:30', name: '歐風咖哩 Bondy (神保町本店)', desc: '排隊神店！醬汁濃郁層次極多，配上一顆熱騰騰的烤馬鈴薯。', location: '歐風咖哩 Bondy 神保町本店', url: 'https://bondy.co.jp/', price: '約 ¥1,500', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '約 5 分鐘' } },
-                        { id: '6-4', time: '14:00', name: '菅村書店', desc: '專營汽車雜誌的二手書店，尋找經典舊車雜誌與型錄。', location: '菅村書店', type: 'shop', transportToNext: { type: 'train', lines: ['shinjuku', 'jr_sobu'], name: '都營新宿線 轉 JR總武線', duration: '約 15 分鐘' } },
-                        { id: '6-5', time: '16:30', name: 'Yodobashi Camera (秋葉原店)', desc: '大型綜合家電量販店，可參觀按摩椅專區與 6 樓模型區。', location: 'Yodobashi Camera 秋葉原店', type: 'shop', transportToNext: { type: 'train', line: 'jr_yamanote', name: 'JR山手線', duration: '約 10 分鐘' } },
-                        { id: '6-6', time: '19:00', name: '韻松亭', desc: '位於上野公園內的百年老屋料亭，為旅程最後一晚慶祝。', location: '上野 韻松亭', url: 'https://www.inshotei.jp/', price: '會席料理約 ¥8,000 - ¥10,000', tags: ['需提前預約'], type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '約 15 分鐘' } },
-                        { id: '6-7', time: '21:30', name: '返回住宿', desc: '回到住宿地點整理行李與休息。', location: '上野小築', type: 'hotel' }
+                    { id: 'day6', title: '5/15 (五)', theme: '歲月流金 ‧ 漫閱老街風華與浪漫星夜', areas: ['谷根千', '銀座', '六本木'], spots: [
+                        { id: '6-0', time: '07:30', name: '上野小築周邊', action: '出發 ‧ 簡易早餐', desc: '最後一個全天行程，提早出發並在途中享用溫暖的早餐。準備感受東京的昭和復古與現代繁華。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行 / 巴士', duration: '前往根津' } },
+                        { id: '6-1', time: '08:30', name: '根津神社', action: '參拜祈福 ‧ 千本鳥居攝影', desc: '避開人潮拍攝絕美的迷你千本鳥居隧道。欣賞充滿江戶時代美學的神社建築與杜鵑花苑。', location: '文京區', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '前往谷根千' } },
+                        { id: '6-2', time: '10:00', name: '谷根千', action: '昭和老街散策 ‧ 懷舊甜點', desc: '登上著名的「夕陽階梯」俯瞰谷中銀座。悠閒品嚐 Le Coussinet 泡芙或和栗屋的極致蒙布朗。', location: '谷根千', type: 'sight', transportToNext: { type: 'walk', name: '步行', duration: '前往日暮里' } },
+                        { id: '6-3', time: '11:30', name: 'Burari (日暮里)', action: '午餐 ‧ 米其林雞白湯拉麵', desc: '享用榮獲米其林指南推薦的質感拉麵。湯頭濃郁清甜而不膩，完美撫慰連日外食的腸胃。', location: '日暮里', type: 'food', tags: ['米其林推薦'], transportToNext: { type: 'train', lines: ['jr_yamanote'], name: 'JR 山手線', duration: '前往新橋' } },
+                        { id: '6-4', time: '13:30', name: '烏森神社 ‧ 芝大神宮', action: '參拜 ‧ 強運與事業雙祈願', desc: '展開轉運補完計畫。依序參拜烏森神社祈求事業順利，再前往芝大神宮求取絕美的強運御守。', location: '新橋・港區', type: 'sight', tags: ['務必於 17:00 前完成'], transportToNext: { type: 'train', lines: ['toei_asakusa'], name: '都營淺草線', duration: '前往銀座' } },
+                        { id: '6-5', time: '15:30', name: '銀座商圈', action: '機能時尚 ‧ 質感雜貨採買', desc: '造訪 Workman Colors 尋找高機能服飾，並於 Ginza Loft 補齊生活雜貨與特色文具。', location: '銀座商圈', type: 'shop', transportToNext: { type: 'walk', name: '步行', duration: '前往咖啡廳' } },
+                        { id: '6-6', time: '17:15', name: 'Tricolore Coffee 本店', action: '午茶 ‧ 90 年復古喫茶店', desc: '在擁有 90 年歷史的紅磚建築喫茶店內稍作停歇。品味手沖咖啡與復古蘋果派，享受老派浪漫。', location: '銀座', type: 'food', transportToNext: { type: 'train', lines: ['hibiya'], name: '日比谷線 (銀座 ➔ 神谷町)', duration: '前往芝公園' } },
+                        { id: '6-7', time: '18:30', name: '芝公園周邊', action: '東京鐵塔 ‧ 最終點燈攝影', desc: '於芝給水所公園及 Belle Face 街景角度取景。捕捉入夜後亮起經典橘紅暖光的東京鐵塔。', location: '芝公園', type: 'sight', transportToNext: { type: 'train', lines: ['hibiya'], name: '日比谷線 (神谷町 ➔ 銀座)', duration: '折返吃晚餐' } },
+                        { id: '6-8', time: '19:30', name: '銀座天龍 本店', action: '晚餐 ‧ 招牌巨大煎餃', desc: '豪邁享用長度驚人的招牌巨大煎餃。以視覺與味覺的雙重衝擊，熱烈慶祝最後一晚的旅程高潮。', location: '銀座', type: 'food', transportToNext: { type: 'train', lines: ['hibiya'], name: '日比谷線 (銀座 ➔ 六本木)', duration: '前往六本木' } },
+                        { id: '6-9', time: '21:00', name: '六本木新城 Sky Deck', action: '露天觀景 ‧ 璀璨夜景謝幕', desc: '登上頂樓戶外停機坪。在無玻璃遮擋的星空下，將璀璨的東京鐵塔與東京都心夜景盡收眼底。', location: '六本木', type: 'sight', transportToNext: { type: 'train', lines: ['hibiya'], name: '日比谷線', duration: '直達回上野' } },
+                        { id: '6-10', time: '22:30', name: '上野小築', action: '返回住宿 ‧ 整理行李', desc: '返回住宿點，開始進行浩大的行李打包工程。確認所有戰利品皆妥善收納，準備明日返台。', location: '上野小築', type: 'hotel' }
                     ]},
-                    { id: 'day7', title: '5/16 (六)', spots: [
-                        { id: '7-1', time: '07:30', name: '整理行李與退房', desc: '確認所有物品皆已打包，退房準備離開。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
-                        { id: '7-2', time: '08:00', name: '早餐時間', desc: '於住宿地點附近的麵包店或家庭餐廳快速享用早餐。', location: '上野小築周邊', price: '約 ¥1,000', type: 'food', transportToNext: { type: 'walk', name: '步行', duration: '約 10 分鐘' } },
-                        { id: '7-3', time: '09:00', name: '多慶屋 (御徒町本店)', desc: '東京知名平價量販店，進行最後的零食、藥妝與伴手禮採購！', location: '多慶屋 御徒町本店', type: 'shop', transportToNext: { type: 'walk', name: '步行', duration: '約 10 分鐘' } },
-                        { id: '7-4', time: '10:00', name: '回住宿領取行李', desc: '帶齊行李，出發前往車站。', location: '上野小築', type: 'transit', transportToNext: { type: 'walk', name: '步行', duration: '約 10 分鐘' } },
-                        { id: '7-5', time: '10:30', name: '搭乘京成電鐵', desc: '自京成上野站搭乘 Skyliner 特急列車直達機場航廈。', location: '京成上野站', type: 'transit', transportToNext: { type: 'train', line: 'keisei_skyliner', name: 'Skyliner (京成電鐵)', duration: '約 41 分鐘' } },
-                        { id: '7-6', time: '12:00', name: '搭機返回台灣', desc: '班機準備起飛，帶著滿滿回憶平安返家！', location: '成田國際機場 第一航廈', type: 'transit', transportToNext: { type: 'plane', name: '酷航 TR897', duration: '約 3 小時 45 分鐘' } },
-                        { id: '7-7', time: '14:45', name: '抵達桃園機場 (第一航廈)', desc: '平安抵達台灣，結束美好的旅程！', location: '桃園國際機場', type: 'hotel' }
+                    { id: 'day7', title: '5/16 (六)', theme: '歸途拾光 ‧ 收攏近郊風情與滿載行囊', areas: ['成田', '機場'], spots: [
+                        { id: '7-0', time: '08:00', name: '上野小築', action: '悠閒晨光 ‧ 退房手續', desc: '於住宿周邊享用早餐，並做最後的房間巡視。確認重要物品皆未遺漏後，完成退房手續準備告別。', location: '上野小築', type: 'hotel', transportToNext: { type: 'walk', name: '步行', duration: '前往車站' } },
+                        { id: '7-1', time: '09:30', name: '京成上野站', action: '撤離移動 ‧ 直達機場', desc: '持預先購買好的 Skyliner 票券進站搭車。搭乘舒適的對號座特急列車，輕鬆前往成田機場。', location: '京成上野站', type: 'transit', transportToNext: { type: 'train', lines: ['keisei_skyliner'], name: 'Skyliner (京成電鐵)', duration: '約 41 分鐘' } },
+                        { id: '7-2', time: '11:00', name: '成田機場 T1', action: '人工寄物 ‧ 卸下重裝備', desc: '於第一航廈的寄物櫃檯寄放所有大件行李。確保大家在後續的近郊行程中，能享受零負重的輕鬆感。', location: '成田機場 第一航廈', type: 'transit', transportToNext: { type: 'train', lines: ['keisei'], name: '京成本線 (非 Skyliner)', duration: '前往京成成田站' } },
+                        { id: '7-3', time: '12:00', name: '成田山表參道', action: '江戶散策 ‧ 自由午餐', desc: '隨意探索充滿江戶風情的老街，並自行選擇順眼的餐廳用餐。在古色古香的氛圍中，享受愜意的午後時光。', location: '成田山表參道', type: 'sight', transportToNext: { type: 'walk', name: '步行 (約 1.5km)', duration: '當作飯後散步' } },
+                        { id: '7-4', time: '14:00', name: 'AEON MALL 成田', action: '核心重點 ‧ 最後採購衝刺', desc: '於寬敞舒適的大型商場，補足所有伴手禮、藥妝與服飾需求。這裡動線良好且環境舒適，非常適合輕鬆逛街。', location: 'AEON MALL 成田', type: 'shop', transportToNext: { type: 'walk', name: '步行', duration: '前往餐廳' } },
+                        { id: '7-5', time: '17:30', name: 'AEON MALL 餐廳區', action: '最後晚餐 ‧ 飽餐一頓', desc: '採購完畢後，直接於商場內的美食街或餐廳享用晚餐。餐後搭乘地區公車至京成成田站，再轉乘「京成本線」回機場。', location: 'AEON MALL 餐廳區', type: 'food', transportToNext: { type: 'bus', name: '公車 ➔ 京成本線', duration: '轉乘回機場' } },
+                        { id: '7-6', time: '19:30', name: '成田機場 T1', action: '領取行李 ‧ 最終打包秤重', desc: '取回寄放的重型行李，並在機場寬敞處將戰利品妥善裝箱。利用機場磅秤進行精準秤重，確保行李符合廉航標準。', location: '成田機場 第一航廈', type: 'transit', transportToNext: { type: 'walk', name: '步行', duration: '前往報到櫃檯' } },
+                        { id: '7-7', time: '20:45', name: '樂桃報到櫃檯', action: 'MM627 ‧ 辦理登機手續', desc: '完成行李整理後，前往樂桃航空櫃檯辦理報到與託運。從容應對回程手續，並完成隨身行李的安檢與通關。', location: '成田機場 第一航廈', type: 'transit', transportToNext: { type: 'plane', name: '樂桃 MM627', duration: '約 3.5 小時' } },
+                        { id: '7-8', time: '22:45', name: '樂桃 MM627', action: '歸途起飛 ‧ 平安返航', desc: '搭機返回台北，為這趟美好的東京旅行劃下完美句點。班機預計於隔日凌晨 01:00 抵達溫暖的家。', location: '成田國際機場', type: 'transit', transportToNext: { type: 'car', name: '機場接送', duration: '返回住家' } }
                     ]}
                 ]);
 
@@ -1651,7 +1686,14 @@
                             const safeExpr = calcExpression.value.replace(/[+\-*/.]$/, '');
                             if(safeExpr) calcExpression.value = eval(safeExpr).toString(); 
                         } catch(e) { calcExpression.value = ''; } 
-                    } else calcExpression.value += op;
+                    } else {
+                        // 🌟 修正 1：計算機防呆機制 - 如果最後一個字元已經是運算符號，就自動替換為最新的符號
+                        if (/[+\-*/]$/.test(calcExpression.value)) {
+                            calcExpression.value = calcExpression.value.slice(0, -1) + op;
+                        } else {
+                            calcExpression.value += op;
+                        }
+                    }
                 };
 
                 const handleCalc = (k) => {
